@@ -77,11 +77,11 @@ export function ByNikKk() {
 
     try {
       const payload = {
-        USER_ID: config.userId,
-        PASSWORD: config.password,
-        IP_USER: config.ipUser,
-        NIK: nik,
-        transactionId: trxId
+        USER_ID: (config.userId || '').trim(),
+        PASSWORD: (config.password || '').trim(),
+        IP_USER: (config.ipUser || '').trim(),
+        NIK: nik.trim(),
+        transactionId: trxId.trim()
       };
 
       const endpointUrl = '/dukcapil/get_json/DEMO/CALL_NIK_GET_KK';
@@ -102,6 +102,11 @@ export function ByNikKk() {
       
       if (!data.content || !Array.isArray(data.content) || data.content.length === 0) {
         throw new Error('Data KK tidak ditemukan atau format respon tidak sesuai.');
+      }
+
+      const firstItem = data.content[0] as any;
+      if (firstItem.RESPONSE_CODE && firstItem.RESPONSE_CODE !== '00') {
+        throw new Error(`Autentikasi Gagal: ${firstItem.RESPONSE_DESC || firstItem.RESPONSE || 'Login Gagal'} (Kode: ${firstItem.RESPONSE_CODE}). Periksa User ID, Password, dan IP User di Pengaturan API.`);
       }
       
       setResult(data);

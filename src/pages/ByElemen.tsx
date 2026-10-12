@@ -69,9 +69,9 @@ export function ByElemen() {
     try {
       // Remove empty strings from payload
       const payload: any = {
-        USER_ID: config.userId,
-        PASSWORD: config.password,
-        IP_USER: config.ipUser,
+        USER_ID: (config.userId || '').trim(),
+        PASSWORD: (config.password || '').trim(),
+        IP_USER: (config.ipUser || '').trim(),
       };
 
       Object.entries(formData).forEach(([key, value]) => {
@@ -108,7 +108,12 @@ export function ByElemen() {
       setRawResponse(data);
       
       if (data.content && data.content.length > 0) {
-        setResult(data.content[0]);
+        const item = data.content[0];
+        if (item.RESPONSE_CODE && item.RESPONSE_CODE !== '00') {
+          setError(`Autentikasi Gagal: ${item.RESPONSE_DESC || item.RESPONSE || 'Login Gagal'} (Kode: ${item.RESPONSE_CODE}). Periksa User ID, Password, dan IP User di Pengaturan API.`);
+          return;
+        }
+        setResult(item);
         setIsFormOpen(false);
       } else {
         setError('Data tidak ditemukan');

@@ -11,7 +11,14 @@ export function SettingsModal() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setConfig(formData);
+    const sanitized = {
+      userId: (formData.userId || '').trim(),
+      password: (formData.password || '').trim(),
+      ipUser: (formData.ipUser || '').trim(),
+      serverUrl: (formData.serverUrl || '').trim(),
+    };
+    setConfig(sanitized);
+    setFormData(sanitized);
     setIsOpen(false);
   };
 

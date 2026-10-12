@@ -23,11 +23,11 @@ export function ByNik() {
 
     try {
       const payload = {
-        USER_ID: config.userId,
-        PASSWORD: config.password,
-        IP_USER: config.ipUser,
-        NIK: nik,
-        transactionId: trxId
+        USER_ID: (config.userId || '').trim(),
+        PASSWORD: (config.password || '').trim(),
+        IP_USER: (config.ipUser || '').trim(),
+        NIK: nik.trim(),
+        transactionId: trxId.trim()
       };
 
       const endpointUrl = '/dukcapil/get_json/DEMO/CALL_NIK';
@@ -48,7 +48,12 @@ export function ByNik() {
       const data = await response.json();
       
       if (data.content && data.content.length > 0) {
-        setResult(data.content[0]);
+        const item = data.content[0];
+        if (item.RESPONSE_CODE && item.RESPONSE_CODE !== '00') {
+          setError(`Autentikasi Gagal: ${item.RESPONSE_DESC || item.RESPONSE || 'Login Gagal'} (Kode: ${item.RESPONSE_CODE}). Periksa User ID, Password, dan IP User di Pengaturan API.`);
+          return;
+        }
+        setResult(item);
         if (window.innerWidth < 1024) setIsFormOpen(false);
       } else {
         setError('Data tidak ditemukan');

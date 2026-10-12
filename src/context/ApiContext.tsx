@@ -28,9 +28,10 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(saved);
         return {
-          ...defaultAPIConfig,
-          ...parsed,
-          serverUrl: parsed.serverUrl || defaultAPIConfig.serverUrl,
+          userId: (parsed.userId || defaultAPIConfig.userId).trim(),
+          password: (parsed.password || defaultAPIConfig.password).trim(),
+          ipUser: (parsed.ipUser || defaultAPIConfig.ipUser).trim(),
+          serverUrl: (parsed.serverUrl || defaultAPIConfig.serverUrl).trim(),
         };
       } catch (e) {
         // ignore
@@ -40,8 +41,14 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   });
 
   const setConfig = (newConfig: ApiConfig) => {
-    setConfigState(newConfig);
-    localStorage.setItem('dukcapil_api_config', JSON.stringify(newConfig));
+    const sanitized: ApiConfig = {
+      userId: (newConfig.userId || '').trim(),
+      password: (newConfig.password || '').trim(),
+      ipUser: (newConfig.ipUser || '').trim(),
+      serverUrl: (newConfig.serverUrl || '').trim(),
+    };
+    setConfigState(sanitized);
+    localStorage.setItem('dukcapil_api_config', JSON.stringify(sanitized));
   };
 
   return (
