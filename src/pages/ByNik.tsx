@@ -45,7 +45,13 @@ export function ByNik() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data: any;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(`Respon server bukan format JSON yang valid (Status: ${response.status}). Kemungkinan URL salah atau server mengembalikan halaman HTML.`);
+      }
       
       if (data.content && data.content.length > 0) {
         const item = data.content[0];

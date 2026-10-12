@@ -104,7 +104,13 @@ export function ByElemen() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data: any;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        throw new Error(`Respon server bukan format JSON yang valid (Status: ${response.status}). Kemungkinan URL salah atau server mengembalikan halaman HTML. Pastikan Server URL di Pengaturan API sudah benar.`);
+      }
       setRawResponse(data);
       
       if (data.content && data.content.length > 0) {
