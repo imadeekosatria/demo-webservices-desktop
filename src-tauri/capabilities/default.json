@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default permissions for Verifikasi Penduduk Desktop",
+  "windows": ["main", "*"],
+  "permissions": [
+    "core:default",
+    "http:default",
+    {
+      "identifier": "http:allow-all",
+      "allow": [
+        {
+          "url": "*://*/*"
+        }
+      ]
+    }
+  ]
+}

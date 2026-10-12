@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3003:80"
+    restart: unless-stopped
+    networks:
+      - dukcapil-network
+
+networks:
+  dukcapil-network:
+    driver: bridge

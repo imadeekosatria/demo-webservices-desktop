@@ -1,0 +1,8 @@
+{
+  "name": "Desktop Demo Verifikasi Penduduk",
+  "description": "Aplikasi versi desktop demo untuk verifikasi data penduduk.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
