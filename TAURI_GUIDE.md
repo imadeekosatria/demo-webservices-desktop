@@ -45,13 +45,17 @@ Install Rust toolchain resmi:
 ### 1. Mode Development Desktop
 Jalankan dev server frontend bersamaan dengan jendela desktop Tauri:
 ```bash
+bun tauri:dev
+# atau jika menggunakan npm:
 npm run tauri:dev
 ```
-Perintah ini akan menjalankan Vite dev server dan membuka window aplikasi desktop dengan fitur Hot-Reloading.
+Perintah ini akan menjalankan dev server dan membuka window aplikasi desktop dengan fitur Hot-Reloading.
 
 ### 2. Membangun Installer Desktop (Production Build)
 Untuk membuat file installer / executable:
 ```bash
+bun tauri:build
+# atau jika menggunakan npm:
 npm run tauri:build
 ```
 Hasil build installer akan berada di:
