@@ -1,7 +1,54 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { useApiConfig } from '../context/ApiContext';
-import { Search, Loader2, AlertCircle, ChevronDown, CheckCircle, XCircle, ChevronUp, Code2, X } from 'lucide-react';
+import { Search, Loader2, AlertCircle, ChevronDown, CheckCircle, XCircle, ChevronUp, Code2, X, Calendar } from 'lucide-react';
 import { dukcapilFetch } from '../services/apiClient';
+
+/**
+ * Konversi format tanggal YYYY-MM-DD (dari HTML5 Datepicker) ke DD-MM-YYYY (skema API Dukcapil)
+ */
+function isoToDukcapilDate(isoDate: string): string {
+  if (!isoDate) return '';
+  const parts = isoDate.split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}-${month}-${year}`;
+  }
+  return isoDate;
+}
+
+/**
+ * Konversi format tanggal DD-MM-YYYY (skema API Dukcapil) ke YYYY-MM-DD (untuk HTML5 Datepicker)
+ */
+function dukcapilDateToIso(dukcapilDate: string): string {
+  if (!dukcapilDate) return '';
+  const parts = dukcapilDate.split('-');
+  if (parts.length === 3 && parts[2]?.length === 4) {
+    const [day, month, year] = parts;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  return '';
+}
+
+/**
+ * Menampilkan format tanggal Indonesia ramah pengguna (contoh: 17 Agustus 1995)
+ */
+function formatIndonesianDate(dukcapilDate: string): string {
+  if (!dukcapilDate) return '';
+  const parts = dukcapilDate.split('-');
+  if (parts.length === 3 && parts[2]?.length === 4) {
+    const day = parseInt(parts[0], 10);
+    const monthIndex = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    if (!isNaN(day) && monthIndex >= 0 && monthIndex < 12 && !isNaN(year)) {
+      return `${day} ${months[monthIndex]} ${year}`;
+    }
+  }
+  return '';
+}
 
 export function ByElemen() {
   const { config } = useApiConfig();
@@ -45,6 +92,18 @@ export function ByElemen() {
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/[^0-9-]/g, '');
+    // Otomatis ubah 8 digit angka berturut-turut (DDMMYYYY) menjadi format DD-MM-YYYY
+    if (/^\d{8}$/.test(val)) {
+      const d = val.slice(0, 2);
+      const m = val.slice(2, 4);
+      const y = val.slice(4, 8);
+      val = `${d}-${m}-${y}`;
+    }
+    setFormData(prev => ({ ...prev, TGL_LHR: val }));
   };
 
   const handleSearch = async (e: FormEvent) => {
@@ -391,9 +450,55 @@ export function ByElemen() {
               
               {isAdvancedOpen && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 animate-in slide-in-from-top-2 duration-200">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase">Tgl Lahir</label>
-                    <input type="text" name="TGL_LHR" value={formData.TGL_LHR} onChange={handleChange} className="border border-slate-300 rounded-lg px-3 py-2 text-sm uppercase" placeholder="DD-MM-YYYY" />
+                  <div className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-bold text-slate-500 uppercase">Tgl Lahir</label>
+                      <span className="text-[10px] text-slate-400 font-mono">DD-MM-YYYY</span>
+                    </div>
+                    <div className="relative flex items-center">
+                      <input 
+                        type="text" 
+                        name="TGL_LHR" 
+                        value={formData.TGL_LHR} 
+                        onChange={handleDateTextChange} 
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 pr-14 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none uppercase placeholder:text-slate-400 bg-white" 
+                        placeholder="DD-MM-YYYY" 
+                      />
+                      <div className="absolute right-1.5 flex items-center gap-0.5">
+                        {formData.TGL_LHR && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, TGL_LHR: '' }))}
+                            className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors z-10"
+                            title="Hapus Tanggal"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                        <label
+                          className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors cursor-pointer relative flex items-center justify-center overflow-hidden"
+                          title="Buka Kalender Pemilih Tanggal"
+                        >
+                          <Calendar size={16} />
+                          <input
+                            type="date"
+                            value={dukcapilDateToIso(formData.TGL_LHR)}
+                            onChange={(e) => {
+                              const isoVal = e.target.value;
+                              const formatted = isoToDukcapilDate(isoVal);
+                              setFormData(prev => ({ ...prev, TGL_LHR: formatted }));
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    {formatIndonesianDate(formData.TGL_LHR) && (
+                      <p className="text-[10px] text-blue-600 font-medium truncate flex items-center gap-1">
+                        <span>🗓️</span>
+                        <span>{formatIndonesianDate(formData.TGL_LHR)}</span>
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold text-slate-500 uppercase">Status Hub Keluarga</label>
