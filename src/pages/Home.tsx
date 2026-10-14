@@ -16,10 +16,15 @@ import {
   Lock,
   Unlock,
   KeyRound,
-  Code2
+  Code2,
+  RefreshCw,
+  DownloadCloud,
+  User,
+  Sparkles
 } from 'lucide-react';
 import { isDesktopApp } from '../services/apiClient';
 import { useApiConfig } from '../context/ApiContext';
+import { checkAppUpdate, UpdateInfo } from '../services/updaterService';
 
 export function Home() {
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
@@ -29,6 +34,10 @@ export function Home() {
   // Password state for internal feature unlock inside Tech Modal
   const [unlockPassword, setUnlockPassword] = useState('');
   const [unlockError, setUnlockError] = useState(false);
+
+  // OTA Update state
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateInfo | null>(null);
 
   const isDesktop = isDesktopApp();
   const { config } = useApiConfig();
@@ -71,6 +80,23 @@ export function Home() {
     window.dispatchEvent(new Event('internal_locked'));
   };
 
+  const handleCheckUpdate = async () => {
+    setCheckingUpdate(true);
+    setUpdateResult(null);
+    try {
+      const res = await checkAppUpdate();
+      setUpdateResult(res);
+    } catch (e: any) {
+      setUpdateResult({
+        available: false,
+        currentVersion: '1.0.1',
+        error: e.message || 'Gagal memeriksa pembaruan.'
+      });
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full pb-8">
       {/* Hero Banner */}
@@ -84,6 +110,9 @@ export function Home() {
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
                 Direktorat Jenderal Kependudukan & Pencatatan Sipil
               </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
+                v1.0.1
+              </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Sistem Aktif
@@ -95,6 +124,12 @@ export function Home() {
             <p className="text-slate-500 text-sm max-w-2xl mt-1 leading-relaxed">
               Platform validasi identitas penduduk berbasis web services Kemendagri. Lakukan pencocokan elemen data secara aman, cepat, dan terpercaya.
             </p>
+            <div className="mt-2.5 flex items-center justify-center md:justify-start gap-2 text-xs text-slate-400">
+              <span className="flex items-center gap-1">
+                <User size={13} className="text-slate-400" />
+                Dibuat oleh: <strong className="text-slate-700 font-medium">imadeekosatria</strong>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -102,11 +137,11 @@ export function Home() {
         <div className="shrink-0 z-10 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-2">
           <button
             onClick={() => setShowTechModal(true)}
-            className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-800 transition-colors shadow-xs"
-            title="Buka informasi teknis framework dan developer"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-xs"
+            title="Buka informasi teknis framework, OTA update, dan developer"
           >
-            <Code2 size={15} className="text-slate-500" />
-            <span>Info Sistem & Teknis</span>
+            <Code2 size={15} className="text-blue-600" />
+            <span>Info Sistem & Pembaruan</span>
           </button>
         </div>
 
@@ -306,7 +341,7 @@ export function Home() {
         </div>
       </div>
 
-      {/* POP-UP MODAL: Technical & Developer Info (Includes Hidden Internal Access) */}
+      {/* POP-UP MODAL: Technical & Developer Info (Includes OTA Update & Hidden Internal Access) */}
       {showTechModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200">
@@ -317,8 +352,8 @@ export function Home() {
                   <Terminal size={18} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold leading-tight">Informasi Sistem & Teknis</h3>
-                  <p className="text-[11px] text-slate-400">Detail runtime framework, arsitektur, dan akses khusus</p>
+                  <h3 className="text-sm font-bold leading-tight">Informasi Sistem & Pembaruan</h3>
+                  <p className="text-[11px] text-slate-400">Detail versi v1.0.1, pembaruan OTA, dan pengembang</p>
                 </div>
               </div>
               <button 
@@ -331,6 +366,84 @@ export function Home() {
 
             {/* Modal Content */}
             <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto text-slate-800 text-sm">
+              {/* App Identity & Version */}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Identitas Aplikasi</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">v1.0.1</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-semibold">PENGEMBANG / PUBLISHER</span>
+                    <strong className="text-slate-800 text-sm font-bold">imadeekosatria</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-semibold">IDENTIFIER PAKET</span>
+                    <span className="text-slate-600 font-mono text-[11px] truncate block">com.imadeekosatria.verifikasi.penduduk</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* OTA UPDATE SECTION */}
+              <div className="p-4 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 rounded-xl border border-blue-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <DownloadCloud size={16} className="text-blue-600" />
+                    <span className="text-xs font-bold text-blue-950">Pembaruan Over-The-Air (OTA)</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full">
+                    Tauri Updater v2
+                  </span>
+                </div>
+
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Aplikasi telah dikonfigurasi untuk memeriksa rilis pembaruan baru secara otomatis langsung dari repositori GitHub (<code>imadeekosatria/demo-webservices-desktop</code>).
+                </p>
+
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCheckUpdate}
+                    disabled={checkingUpdate}
+                    className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-60 shadow-xs"
+                  >
+                    <RefreshCw size={12} className={checkingUpdate ? 'animate-spin' : ''} />
+                    {checkingUpdate ? 'Memeriksa Server...' : 'Periksa Pembaruan'}
+                  </button>
+
+                  <span className="text-[11px] text-slate-500 truncate">
+                    Endpoint: <code className="text-[10px] bg-white px-1 py-0.5 rounded border border-blue-200">GitHub Releases</code>
+                  </span>
+                </div>
+
+                {updateResult && (
+                  <div className={`p-2.5 rounded-lg text-xs border ${
+                    updateResult.available 
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                      : updateResult.error 
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : 'bg-white text-slate-700 border-slate-200'
+                  }`}>
+                    {updateResult.available ? (
+                      <div>
+                        <strong>Versi {updateResult.latestVersion} tersedia!</strong>
+                        <p className="text-[11px] mt-0.5 text-emerald-700">{updateResult.notes}</p>
+                      </div>
+                    ) : updateResult.error ? (
+                      <div>
+                        <p className="font-semibold">{updateResult.error}</p>
+                        <p className="text-[10px] text-amber-600 mt-0.5">Pastikan koneksi internet aktif dan rilis GitHub sudah terpublikasi.</p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                        <span>{updateResult.notes}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Runtime Status */}
               <div>
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
@@ -345,23 +458,12 @@ export function Home() {
                     </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Endpoint Server</span>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Endpoint Server Dukcapil</span>
                     <span className="text-xs font-mono font-bold text-slate-700 block truncate mt-1" title={config.serverUrl}>
                       {config.serverUrl || 'https://172.16.160.177:8000'}
                     </span>
                   </div>
                 </div>
-              </div>
-
-              {/* Framework & Security Info */}
-              <div className="p-4 bg-blue-50/60 rounded-xl border border-blue-100 space-y-1.5 text-xs text-slate-700">
-                <div className="flex items-center gap-2 font-bold text-blue-900">
-                  <Layers size={14} className="text-blue-600" />
-                  <span>Arsitektur & Keamanan Desktop</span>
-                </div>
-                <p className="text-[12px] text-slate-600 leading-relaxed">
-                  Aplikasi dibangun menggunakan <strong>Tauri Framework 2.x</strong> dengan frontend React 19. Koneksi ke endpoint Dukcapil menggunakan plugin HTTP natif (<code>@tauri-apps/plugin-http</code>) dengan fitur <code>dangerous-settings</code> yang mem-bypass batasan CORS dan sertifikat SSL internal (self-signed).
-                </p>
               </div>
 
               {/* MERGED: Internal Feature Access Management */}
@@ -377,7 +479,7 @@ export function Home() {
                 </div>
 
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Modul pencarian langsung (<strong>By NIK</strong> dan <strong>By NIK & KK</strong>) disembunyikan secara default untuk keamanan. Masukkan password pengembang untuk mengaktifkannya.
+                  Modul pencarian langsung (<strong>By NIK</strong> dan <strong>By NIK & KK</strong>) disembunyikan secara default untuk keamanan data.
                 </p>
 
                 {isInternalUnlocked ? (
@@ -425,14 +527,13 @@ export function Home() {
               {/* Developer CLI Commands */}
               <div>
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Perintah CLI Pengembang
+                  Perintah Build & Rilis Pengembang
                 </span>
                 <div className="space-y-2.5">
                   <div className="bg-slate-900 text-slate-200 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
                     <div>
                       <span className="text-[10px] text-slate-400 block font-sans">Jalankan Mode Desktop Dev</span>
                       <code className="text-emerald-400 font-bold">bun tauri:dev</code>
-                      <span className="text-slate-500 text-[11px] ml-2 font-sans">(atau npm run tauri:dev)</span>
                     </div>
                     <button 
                       onClick={() => copyToClipboard('bun tauri:dev')}
@@ -445,9 +546,8 @@ export function Home() {
 
                   <div className="bg-slate-900 text-slate-200 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-sans">Build Installer / Executable (.msi / .exe)</span>
+                      <span className="text-[10px] text-slate-400 block font-sans">Build Installer & Updater Artifacts (.msi / .sig)</span>
                       <code className="text-blue-400 font-bold">bun tauri:build</code>
-                      <span className="text-slate-500 text-[11px] ml-2 font-sans">(atau npm run tauri:build)</span>
                     </div>
                     <button 
                       onClick={() => copyToClipboard('bun tauri:build')}

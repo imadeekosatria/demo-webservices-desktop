@@ -67,9 +67,32 @@ Hasil build installer akan berada di:
 
 ## 📁 Struktur Konfigurasi Tauri v2
 
-- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi, identifier paket (`com.kemendagri.verifikasi.penduduk`), plugins, dan bundle.
-- **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `serde`).
-- **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native.
-- **`src-tauri/src/main.rs` & `src-tauri/src/lib.rs`**: Entry point aplikasi desktop Rust dengan plugin HTTP diinisialisasi.
+- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi, identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater), dan bundle.
+- **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `tauri-plugin-updater`, `serde`).
+- **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native dan OTA updater (`updater:default`).
+- **`src-tauri/src/main.rs` & `src-tauri/src/lib.rs`**: Entry point aplikasi desktop Rust dengan plugin HTTP dan Updater diinisialisasi.
 - **`src-tauri/icons/`**: Kumpulan icon aplikasi (32x32, 128x128, 256x256, 512x512, .ico, .icns).
 - **`src/services/apiClient.ts`**: Client komunikasi hybrid (otomatis mendeteksi jika berjalan di runtime Tauri atau Web Browser).
+- **`src/services/updaterService.ts`**: Modul pemeriksa pembaruan OTA interaktif.
+
+---
+
+## 🔄 Konfigurasi Update OTA (Over-The-Air) Otomatis
+
+Aplikasi telah dikonfigurasi menggunakan plugin resmi **`tauri-plugin-updater` v2**:
+
+### 1. Menghasilkan Kunci Tanda Tangan (Signing Key)
+Jalankan perintah ini sekali di terminal lokal untuk membuat pasangan kunci:
+```bash
+bun tauri signer generate -w ~/.tauri/verifikasi.key
+```
+Perintah ini akan mencetak:
+- **Public Key**: Tempelkan ke dalam `src-tauri/tauri.conf.json` di bagian `"plugins" -> "updater" -> "pubkey"`.
+- **Private Key**: Simpan di **GitHub Repository Secrets** dengan nama `TAURI_SIGNING_PRIVATE_KEY` (dan `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` jika menggunakan password).
+
+### 2. Alur Kerja Rilis & Update Otomatis
+1. Update versi di `package.json` dan `src-tauri/tauri.conf.json` (contoh: dari `1.0.1` ke `1.0.2`).
+2. Buat tag git atau push ke branch release, GitHub Action akan meng-compile aplikasi, menandatangani installer, dan mengunggah file `latest.json` ke GitHub Releases.
+3. Aplikasi desktop pengguna akan otomatis mendeteksi rilis baru melalui endpoint:
+   `https://github.com/imadeekosatria/demo-webservices-desktop/releases/latest/download/latest.json`
+4. Pengguna cukup mengklik tombol "Periksa Pembaruan" di menu Info Sistem & Pembaruan untuk mengunduh dan memasang update langsung.

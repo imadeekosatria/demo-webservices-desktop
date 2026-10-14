@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "verifikasi-penduduk-desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.1",
+  "author": "imadeekosatria",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
@@ -19,6 +20,7 @@
     "@tanstack/react-router": "^1.170.32",
     "@tauri-apps/api": "^2.12.3",
     "@tauri-apps/plugin-http": "^2.8.2",
+    "@tauri-apps/plugin-updater": "^2.13.3",
     "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",

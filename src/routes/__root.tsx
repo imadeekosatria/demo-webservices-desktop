@@ -216,10 +216,14 @@ function RootComponent() {
                 {inDesktop ? 'Tauri Desktop' : 'Web Browser'}
               </span>
             </div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase mb-1">Server Dukcapil</p>
-            <p className="text-xs text-slate-600 leading-relaxed break-all">
+            <p className="text-[10px] font-bold text-slate-500 uppercase mb-0.5">Server Dukcapil</p>
+            <p className="text-xs text-slate-600 leading-relaxed break-all mb-2">
               <code className="text-[10px] bg-slate-200 p-0.5 rounded break-all">{config.serverUrl || '172.16.160.177'}</code>
             </p>
+            <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500">
+              <span className="font-semibold text-slate-700">v1.0.1</span>
+              <span>oleh <strong className="text-slate-700">imadeekosatria</strong></span>
+            </div>
           </div>
         </aside>
         
