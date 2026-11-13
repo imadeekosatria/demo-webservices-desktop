@@ -67,7 +67,7 @@ Hasil build installer akan berada di:
 
 ## 📁 Struktur Konfigurasi Tauri v2
 
-- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi (versi `1.0.11`), identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater dengan `installMode: "passive"`), dan bundle (`nsis.installMode: "perMachine"`).
+- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi (versi `1.0.12`), identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater dengan `installMode: "passive"`), dan bundle (`nsis.installMode: "perMachine"`).
 - **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `tauri-plugin-updater`, `tauri-plugin-process`, `tauri-plugin-opener`, `serde`).
 - **`src-tauri/build.rs`**: Menyematkan manifest Windows (`requireAdministrator`) agar aplikasi dan proses OTA update memiliki izin menulis ulang ke folder instalasi Windows (`Program Files`). *(Catatan: saat menjalankan `bun tauri:dev` di Windows, buka terminal sebagai Administrator).*
 - **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native, OTA updater (`updater:default`), restart proses (`process:default`, `process:allow-restart`), dan pembukaan tautan eksternal (`opener:default`, `opener:allow-open-url`).
@@ -93,7 +93,7 @@ Perintah ini akan mencetak:
 - **Private Key**: Simpan di **GitHub Repository Secrets** dengan nama `TAURI_SIGNING_PRIVATE_KEY` (dan `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` jika menggunakan password).
 
 ### 2. Alur Kerja Rilis & Update Otomatis di Dalam Aplikasi
-1. Update versi secara seragam di `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, dan `APP_FALLBACK_VERSION` di `src/services/updaterService.ts` (contoh: ke `1.0.11`).
+1. Update versi secara seragam di `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, dan `APP_FALLBACK_VERSION` di `src/services/updaterService.ts` (contoh: ke `1.0.12`).
 2. Push ke branch `release` (atau jalankan manual melalui **Actions → publish → Run workflow**); pipeline akan membuat satu tag & draft release (`create-release`), membangun seluruh platform secara paralel (`build-tauri`), lalu mempublikasikan rilis secara otomatis (`publish-release`) beserta `latest.json`, `.sig`, dan `Source code (zip/tar.gz)`.
 3. Saat aplikasi desktop dibuka, aplikasi otomatis memeriksa rilis baru melalui endpoint:
    `https://github.com/imadeekosatria/demo-webservices-desktop/releases/latest/download/latest.json`

@@ -12,6 +12,19 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.12',
+    date: '13 Nov 2026',
+    summary: 'Pembatasan nilai input Threshold (%) pada modul Verifikasi Elemen hingga maksimal 100 (0 - 100%).',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Membatasi nilai input Threshold (%) pada modul Verifikasi Elemen hingga maksimal 100 (rentang 0 - 100%) dengan pembatasan otomatis saat mengetik dan validasi form.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.11',
     date: '13 Nov 2026',
     summary: 'Perbaikan koneksi server Dukcapil dan status server pada aplikasi desktop serta perapian folder aset gambar.',

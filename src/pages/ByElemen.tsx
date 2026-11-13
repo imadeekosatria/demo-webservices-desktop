@@ -94,6 +94,21 @@ export function ByElemen() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleThresholdChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw === '') {
+      setFormData(prev => ({ ...prev, TRESHOLD: '' }));
+      return;
+    }
+    const digitsOnly = raw.replace(/\D/g, '');
+    if (digitsOnly === '') {
+      setFormData(prev => ({ ...prev, TRESHOLD: '' }));
+      return;
+    }
+    const numeric = Math.min(100, Math.max(0, parseInt(digitsOnly, 10)));
+    setFormData(prev => ({ ...prev, TRESHOLD: String(numeric) }));
+  };
+
   const handleDateTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/[^0-9-]/g, '');
     // Otomatis ubah 8 digit angka berturut-turut (DDMMYYYY) menjadi format DD-MM-YYYY
@@ -116,6 +131,12 @@ export function ByElemen() {
 
     if (!formData.TRESHOLD) {
       setError('Threshold wajib diisi');
+      return;
+    }
+
+    const thresholdVal = parseInt(formData.TRESHOLD, 10);
+    if (isNaN(thresholdVal) || thresholdVal < 0 || thresholdVal > 100) {
+      setError('Nilai Threshold maksimal 100 (0 - 100%)');
       return;
     }
 
@@ -336,10 +357,13 @@ export function ByElemen() {
                 <input
                   type="number"
                   name="TRESHOLD"
+                  min={0}
+                  max={100}
+                  step={1}
                   value={formData.TRESHOLD}
-                  onChange={handleChange}
+                  onChange={handleThresholdChange}
                   className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                  placeholder="Contoh: 80"
+                  placeholder="0 - 100 (Contoh: 80)"
                   required
                 />
               </div>

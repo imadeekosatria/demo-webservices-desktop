@@ -2,6 +2,10 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.12] - 2026-11-13
+### Diperbaiki
+- Membatasi input **Threshold (%)** pada halaman **Verifikasi Elemen** agar hanya menerima rentang nilai maksimal `100` (`0 - 100%`) melalui pembatasan otomatis saat mengetik dan validasi pengiriman form.
+
 ## [1.0.11] - 2026-11-13
 ### Diperbaiki
 - Memperbaiki kegagalan koneksi ke server Dukcapil dan status *Server Offline* pada aplikasi desktop (`missing client-config header`) dengan menyelaraskan versi modul HTTP (`2.9.0`) serta pustaka pendukung antara frontend dan backend.
