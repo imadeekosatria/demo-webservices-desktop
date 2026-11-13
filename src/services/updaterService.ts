@@ -2,7 +2,7 @@ import type { Update, DownloadEvent } from '@tauri-apps/plugin-updater';
 import { isDesktopApp } from './apiClient';
 import { getChangelogByVersion } from '../data/changelog';
 
-export const APP_FALLBACK_VERSION = '1.0.10';
+export const APP_FALLBACK_VERSION = '1.0.11';
 const GITHUB_REPO = 'imadeekosatria/demo-webservices-desktop';
 const DEFAULT_TAURI_BODY = 'See the assets to download this version and install.';
 

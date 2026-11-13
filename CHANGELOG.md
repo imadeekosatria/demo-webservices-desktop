@@ -2,6 +2,11 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.11] - 2026-11-13
+### Diperbaiki
+- Memperbaiki kegagalan koneksi ke server Dukcapil dan status *Server Offline* pada aplikasi desktop (`missing client-config header`) dengan menyelaraskan versi modul HTTP (`2.9.0`) serta pustaka pendukung antara frontend dan backend.
+- Merapikan penyimpanan aset dengan memindahkan foto profil pengembang ke direktori `assets/images` dan menghapus folder sementara beserta lampiran tangkapan layar yang tidak diperlukan dari build aplikasi.
+
 ## [1.0.10] - 2026-11-13
 ### Diperbaiki
 - Memperbaiki penampilan catatan perubahan (*changelog*) pada kotak pembaruan di **Informasi Sistem & Pembaruan** dengan memastikan `latest.json` menyertakan isi changelog penuh saat rilis, menambahkan *fallback* otomatis dari GitHub Releases, serta area gulir vertikal (*scroll-y*) saat daftar perubahan panjang.

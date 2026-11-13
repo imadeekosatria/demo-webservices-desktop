@@ -12,7 +12,7 @@ interface AboutDeveloperModalProps {
 const DEVELOPER_INFO = {
   name: 'I Made Eko Satria W',
   handle: 'imadeekosatria',
-  photoUrl: '/assets/aistudio/IMG_3058_Original_fecaa48c.jpg',
+  photoUrl: '/assets/images/developer-profile.jpg',
   directorate: 'Direktorat Integrasi Data Kependudukan Daerah',
   directorateGeneral: 'Direktorat Jenderal Kependudukan dan Pencatatan Sipil',
   ministry: 'Kementerian Dalam Negeri',

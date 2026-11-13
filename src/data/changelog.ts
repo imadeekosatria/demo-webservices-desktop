@@ -12,6 +12,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.11',
+    date: '13 Nov 2026',
+    summary: 'Perbaikan koneksi server Dukcapil dan status server pada aplikasi desktop serta perapian folder aset gambar.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Memperbaiki kegagalan koneksi ke server Dukcapil dan indikator Server Offline pada aplikasi desktop (missing client-config header) dengan menyelaraskan versi modul HTTP frontend dan backend ke 2.9.0.',
+          'Memindahkan foto profil pengembang ke folder assets/images serta menghapus folder sementara dan tangkapan layar yang tidak diperlukan dari bundel aplikasi.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.10',
     date: '13 Nov 2026',
     summary: 'Perbaikan tampilan changelog OTA di Informasi Sistem & Pembaruan dengan scroll-y serta pembersihan label teknis agar antarmuka terasa aplikasi desktop native.',
