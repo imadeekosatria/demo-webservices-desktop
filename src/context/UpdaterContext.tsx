@@ -9,6 +9,9 @@ import {
   relaunchDesktopApp,
 } from '../services/updaterService';
 
+const CHANGELOG_SEEN_KEY = 'verifikasi_changelog_seen_version';
+const PENDING_OTA_KEY = 'verifikasi_pending_ota_changelog';
+
 export type UpdateStatus =
   | 'idle'
   | 'checking'
@@ -29,10 +32,16 @@ interface UpdaterContextValue {
   progress: number;
   error?: string;
   isBannerDismissed: boolean;
+  showChangelogModal: boolean;
+  changelogVersion: string;
+  changelogNotes?: string;
+  isAutoChangelog: boolean;
   checkUpdate: (silent?: boolean) => Promise<void>;
   installUpdate: () => Promise<void>;
   relaunchApp: () => Promise<void>;
   dismissBanner: () => void;
+  openChangelog: (version?: string) => void;
+  closeChangelog: () => void;
 }
 
 const UpdaterContext = createContext<UpdaterContextValue | undefined>(undefined);
@@ -48,6 +57,11 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | undefined>(undefined);
   const [isBannerDismissed, setIsBannerDismissed] = useState<boolean>(false);
 
+  const [showChangelogModal, setShowChangelogModal] = useState<boolean>(false);
+  const [changelogVersion, setChangelogVersion] = useState<string>(APP_FALLBACK_VERSION);
+  const [changelogNotes, setChangelogNotes] = useState<string | undefined>(undefined);
+  const [isAutoChangelog, setIsAutoChangelog] = useState<boolean>(false);
+
   const updateRef = useRef<Update | null>(null);
   const statusRef = useRef<UpdateStatus>(status);
   statusRef.current = status;
@@ -55,8 +69,37 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     getActiveAppVersion().then((ver) => {
-      if (active && ver) {
-        setCurrentVersion(ver);
+      if (!active || !ver) return;
+      setCurrentVersion(ver);
+      setChangelogVersion(ver);
+
+      try {
+        const seenVersion = localStorage.getItem(CHANGELOG_SEEN_KEY);
+        if (seenVersion !== ver) {
+          // Tandai segera agar pop-up dijamin hanya muncul satu kali per versi
+          localStorage.setItem(CHANGELOG_SEEN_KEY, ver);
+
+          let pendingNotes: string | undefined;
+          const rawPending = localStorage.getItem(PENDING_OTA_KEY);
+          if (rawPending) {
+            try {
+              const parsed = JSON.parse(rawPending);
+              if (parsed?.version === ver && typeof parsed?.notes === 'string') {
+                pendingNotes = parsed.notes;
+              }
+            } catch {
+              // Abaikan payload penyimpanan yang tidak valid
+            }
+            localStorage.removeItem(PENDING_OTA_KEY);
+          }
+
+          setChangelogVersion(ver);
+          setChangelogNotes(pendingNotes);
+          setIsAutoChangelog(true);
+          setShowChangelogModal(true);
+        }
+      } catch {
+        // Abaikan jika localStorage tidak tersedia
       }
     });
     return () => {
@@ -136,6 +179,17 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
         }
       });
 
+      try {
+        if (latestVersion) {
+          localStorage.setItem(
+            PENDING_OTA_KEY,
+            JSON.stringify({ version: latestVersion, notes })
+          );
+        }
+      } catch {
+        // Abaikan jika localStorage tidak tersedia
+      }
+
       setProgress(100);
       setStatus('ready');
     } catch (err: any) {
@@ -143,7 +197,7 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
       setError(err?.message || 'Gagal mengunduh atau memasang paket pembaruan.');
       setStatus('error');
     }
-  }, []);
+  }, [latestVersion, notes]);
 
   const relaunchApp = useCallback(async () => {
     try {
@@ -157,6 +211,20 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
 
   const dismissBanner = useCallback(() => {
     setIsBannerDismissed(true);
+  }, []);
+
+  const openChangelog = useCallback(
+    (version?: string) => {
+      setChangelogVersion(version || currentVersion);
+      setChangelogNotes(undefined);
+      setIsAutoChangelog(false);
+      setShowChangelogModal(true);
+    },
+    [currentVersion]
+  );
+
+  const closeChangelog = useCallback(() => {
+    setShowChangelogModal(false);
   }, []);
 
   // Auto-check pembaruan secara senyap saat aplikasi desktop dibuka
@@ -180,10 +248,16 @@ export function UpdaterProvider({ children }: { children: ReactNode }) {
         progress,
         error,
         isBannerDismissed,
+        showChangelogModal,
+        changelogVersion,
+        changelogNotes,
+        isAutoChangelog,
         checkUpdate,
         installUpdate,
         relaunchApp,
         dismissBanner,
+        openChangelog,
+        closeChangelog,
       }}
     >
       {children}

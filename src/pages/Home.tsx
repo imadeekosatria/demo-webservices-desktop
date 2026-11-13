@@ -50,6 +50,7 @@ export function Home() {
     checkUpdate,
     installUpdate,
     relaunchApp,
+    openChangelog,
   } = useUpdater();
 
   useEffect(() => {
@@ -365,7 +366,19 @@ export function Home() {
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Identitas Aplikasi</span>
-                  <span className="text-[10px] font-bold font-mono tabular-nums px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">v{currentVersion}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowTechModal(false);
+                        openChangelog(currentVersion);
+                      }}
+                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                    >
+                      Lihat Changelog
+                    </button>
+                    <span className="text-[10px] font-bold font-mono tabular-nums px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">v{currentVersion}</span>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>

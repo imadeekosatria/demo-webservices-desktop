@@ -5,6 +5,7 @@ import { Menu, X, Lock, KeyRound, Loader2, ServerOff, RefreshCw, Monitor, Globe 
 import { useApiConfig } from '../context/ApiContext';
 import { useUpdater } from '../context/UpdaterContext';
 import { UpdateNotification } from '../components/UpdateNotification';
+import { ChangelogModal } from '../components/ChangelogModal';
 import { dukcapilFetch, isDesktopApp } from '../services/apiClient';
 
 export const Route = createRootRoute({
@@ -283,6 +284,7 @@ function RootComponent() {
       )}
 
       <UpdateNotification />
+      <ChangelogModal />
     </div>
   );
 }

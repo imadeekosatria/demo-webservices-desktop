@@ -1,7 +1,7 @@
 import type { Update, DownloadEvent } from '@tauri-apps/plugin-updater';
 import { isDesktopApp } from './apiClient';
 
-export const APP_FALLBACK_VERSION = '1.0.3';
+export const APP_FALLBACK_VERSION = '1.0.4';
 
 export interface UpdateCheckResult {
   available: boolean;
@@ -83,22 +83,39 @@ export async function downloadAndInstallAppUpdate(
   let downloaded = 0;
   let contentLength = 0;
 
-  await update.downloadAndInstall((event: DownloadEvent) => {
-    switch (event.event) {
-      case 'Started':
-        contentLength = event.data.contentLength ?? 0;
-        downloaded = 0;
-        onProgress(downloaded, contentLength, 'downloading');
-        break;
-      case 'Progress':
-        downloaded += event.data.chunkLength;
-        onProgress(downloaded, contentLength, 'downloading');
-        break;
-      case 'Finished':
-        onProgress(contentLength || downloaded, contentLength || downloaded, 'installing');
-        break;
+  try {
+    await update.downloadAndInstall((event: DownloadEvent) => {
+      switch (event.event) {
+        case 'Started':
+          contentLength = event.data.contentLength ?? 0;
+          downloaded = 0;
+          onProgress(downloaded, contentLength, 'downloading');
+          break;
+        case 'Progress':
+          downloaded += event.data.chunkLength;
+          onProgress(downloaded, contentLength, 'downloading');
+          break;
+        case 'Finished':
+          onProgress(contentLength || downloaded, contentLength || downloaded, 'installing');
+          break;
+      }
+    });
+  } catch (err: any) {
+    const rawMsg = String(err?.message || err || '');
+    const lower = rawMsg.toLowerCase();
+    if (
+      lower.includes('access is denied') ||
+      lower.includes('permission denied') ||
+      lower.includes('elevation') ||
+      lower.includes('740') ||
+      lower.includes('os error 5')
+    ) {
+      throw new Error(
+        'Akses penulisan folder instalasi ditolak oleh Windows. Tutup aplikasi lalu jalankan kembali dengan klik kanan → "Run as administrator".'
+      );
     }
-  });
+    throw err;
+  }
 }
 
 /**
