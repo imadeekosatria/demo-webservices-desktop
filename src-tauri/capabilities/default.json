@@ -6,6 +6,8 @@
   "permissions": [
     "core:default",
     "updater:default",
+    "process:default",
+    "process:allow-restart",
     {
       "identifier": "http:default",
       "allow": [

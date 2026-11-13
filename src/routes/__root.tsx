@@ -3,6 +3,8 @@ import { createRootRoute, Outlet, Link, useLocation } from '@tanstack/react-rout
 import { SettingsModal } from '../components/SettingsModal';
 import { Menu, X, Lock, KeyRound, Loader2, ServerOff, RefreshCw, Monitor, Globe } from 'lucide-react';
 import { useApiConfig } from '../context/ApiContext';
+import { useUpdater } from '../context/UpdaterContext';
+import { UpdateNotification } from '../components/UpdateNotification';
 import { dukcapilFetch, isDesktopApp } from '../services/apiClient';
 
 export const Route = createRootRoute({
@@ -15,6 +17,7 @@ function RootComponent() {
   const closeSidebar = () => setIsSidebarOpen(false);
   
   const { config } = useApiConfig();
+  const { currentVersion } = useUpdater();
   const [serverStatus, setServerStatus] = useState<'online' | 'offline' | 'checking'>('checking');
 
   // Secret Internal Unlock Logic
@@ -221,7 +224,7 @@ function RootComponent() {
               <code className="text-[10px] bg-slate-200 p-0.5 rounded break-all">{config.serverUrl || '172.16.160.177'}</code>
             </p>
             <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500">
-              <span className="font-semibold text-slate-700">v1.0.1</span>
+              <span className="font-semibold text-slate-700 font-mono tabular-nums">v{currentVersion}</span>
               <span>oleh <strong className="text-slate-700">imadeekosatria</strong></span>
             </div>
           </div>
@@ -278,6 +281,8 @@ function RootComponent() {
           </div>
         </div>
       )}
+
+      <UpdateNotification />
     </div>
   );
 }

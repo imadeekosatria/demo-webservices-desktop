@@ -67,19 +67,20 @@ Hasil build installer akan berada di:
 
 ## 📁 Struktur Konfigurasi Tauri v2
 
-- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi, identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater), dan bundle.
-- **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `tauri-plugin-updater`, `serde`).
-- **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native dan OTA updater (`updater:default`).
-- **`src-tauri/src/main.rs` & `src-tauri/src/lib.rs`**: Entry point aplikasi desktop Rust dengan plugin HTTP dan Updater diinisialisasi.
+- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi (versi `1.0.2`), identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater), dan bundle.
+- **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `tauri-plugin-updater`, `tauri-plugin-process`, `serde`).
+- **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native, OTA updater (`updater:default`), dan restart proses (`process:default`, `process:allow-restart`).
+- **`src-tauri/src/main.rs` & `src-tauri/src/lib.rs`**: Entry point aplikasi desktop Rust dengan plugin HTTP, Updater, dan Process diinisialisasi.
 - **`src-tauri/icons/`**: Kumpulan icon aplikasi (32x32, 128x128, 256x256, 512x512, .ico, .icns).
 - **`src/services/apiClient.ts`**: Client komunikasi hybrid (otomatis mendeteksi jika berjalan di runtime Tauri atau Web Browser).
-- **`src/services/updaterService.ts`**: Modul pemeriksa pembaruan OTA interaktif.
+- **`src/services/updaterService.ts`**: Modul pemeriksa, pengunduh, pemasang pembaruan OTA, dan relaunch aplikasi.
+- **`src/context/UpdaterContext.tsx` & `src/components/UpdateNotification.tsx`**: State global OTA (auto-check saat startup) dan pop-up notifikasi progress unduhan langsung di dalam aplikasi.
 
 ---
 
 ## 🔄 Konfigurasi Update OTA (Over-The-Air) Otomatis
 
-Aplikasi telah dikonfigurasi menggunakan plugin resmi **`tauri-plugin-updater` v2**:
+Aplikasi telah dikonfigurasi menggunakan plugin resmi **`tauri-plugin-updater` v2** dan **`tauri-plugin-process` v2**:
 
 ### 1. Menghasilkan Kunci Tanda Tangan (Signing Key)
 Jalankan perintah ini sekali di terminal lokal untuk membuat pasangan kunci:
@@ -90,9 +91,9 @@ Perintah ini akan mencetak:
 - **Public Key**: Tempelkan ke dalam `src-tauri/tauri.conf.json` di bagian `"plugins" -> "updater" -> "pubkey"`.
 - **Private Key**: Simpan di **GitHub Repository Secrets** dengan nama `TAURI_SIGNING_PRIVATE_KEY` (dan `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` jika menggunakan password).
 
-### 2. Alur Kerja Rilis & Update Otomatis
-1. Update versi di `package.json` dan `src-tauri/tauri.conf.json` (contoh: dari `1.0.1` ke `1.0.2`).
-2. Buat tag git atau push ke branch release, GitHub Action akan meng-compile aplikasi, menandatangani installer, dan mengunggah file `latest.json` ke GitHub Releases.
-3. Aplikasi desktop pengguna akan otomatis mendeteksi rilis baru melalui endpoint:
+### 2. Alur Kerja Rilis & Update Otomatis di Dalam Aplikasi
+1. Update versi secara seragam di `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, dan `APP_FALLBACK_VERSION` di `src/services/updaterService.ts` (contoh: ke `1.0.2`).
+2. Push ke branch `main`; GitHub Action akan meng-compile aplikasi, menandatangani installer, dan mengunggah file `latest.json` beserta `.sig` ke GitHub Releases.
+3. Saat aplikasi desktop dibuka, aplikasi otomatis memeriksa rilis baru melalui endpoint:
    `https://github.com/imadeekosatria/demo-webservices-desktop/releases/latest/download/latest.json`
-4. Pengguna cukup mengklik tombol "Periksa Pembaruan" di menu Info Sistem & Pembaruan untuk mengunduh dan memasang update langsung.
+4. Jika ada versi baru, muncul notifikasi pop-up (atau lewat tombol **Periksa Pembaruan** di **Info Sistem & Pembaruan**). Pengguna dapat langsung menekan **Unduh & Pasang**, memantau progress unduhan, lalu menekan **Restart Sekarang** untuk menerapkan versi baru.

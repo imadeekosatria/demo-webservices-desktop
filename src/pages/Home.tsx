@@ -12,7 +12,6 @@ import {
   X, 
   ArrowRight, 
   CheckCircle2, 
-  Layers,
   Lock,
   Unlock,
   KeyRound,
@@ -20,11 +19,13 @@ import {
   RefreshCw,
   DownloadCloud,
   User,
-  Sparkles
+  RotateCcw,
+  AlertCircle
 } from 'lucide-react';
 import { isDesktopApp } from '../services/apiClient';
 import { useApiConfig } from '../context/ApiContext';
-import { checkAppUpdate, UpdateInfo } from '../services/updaterService';
+import { useUpdater } from '../context/UpdaterContext';
+import { formatBytes } from '../services/updaterService';
 
 export function Home() {
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
@@ -35,12 +36,21 @@ export function Home() {
   const [unlockPassword, setUnlockPassword] = useState('');
   const [unlockError, setUnlockError] = useState(false);
 
-  // OTA Update state
-  const [checkingUpdate, setCheckingUpdate] = useState(false);
-  const [updateResult, setUpdateResult] = useState<UpdateInfo | null>(null);
-
   const isDesktop = isDesktopApp();
   const { config } = useApiConfig();
+  const {
+    status: updateStatus,
+    currentVersion,
+    latestVersion,
+    notes: updateNotes,
+    downloadedBytes,
+    totalBytes,
+    progress: updateProgress,
+    error: updateError,
+    checkUpdate,
+    installUpdate,
+    relaunchApp,
+  } = useUpdater();
 
   useEffect(() => {
     setIsInternalUnlocked(sessionStorage.getItem('unlocked_internal') === 'true');
@@ -80,22 +90,8 @@ export function Home() {
     window.dispatchEvent(new Event('internal_locked'));
   };
 
-  const handleCheckUpdate = async () => {
-    setCheckingUpdate(true);
-    setUpdateResult(null);
-    try {
-      const res = await checkAppUpdate();
-      setUpdateResult(res);
-    } catch (e: any) {
-      setUpdateResult({
-        available: false,
-        currentVersion: '1.0.1',
-        error: e.message || 'Gagal memeriksa pembaruan.'
-      });
-    } finally {
-      setCheckingUpdate(false);
-    }
-  };
+  const isCheckingUpdate = updateStatus === 'checking';
+  const isUpdatingBusy = updateStatus === 'downloading' || updateStatus === 'installing';
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full pb-8">
@@ -110,11 +106,10 @@ export function Home() {
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
                 Direktorat Jenderal Kependudukan & Pencatatan Sipil
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
-                v1.0.1
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold font-mono tabular-nums border border-slate-200">
+                v{currentVersion}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Sistem Aktif
               </span>
             </div>
@@ -352,8 +347,8 @@ export function Home() {
                   <Terminal size={18} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold leading-tight">Informasi Sistem & Pembaruan</h3>
-                  <p className="text-[11px] text-slate-400">Detail versi v1.0.1, pembaruan OTA, dan pengembang</p>
+                  <h3 className="text-sm font-bold leading-tight">Informasi Sistem &amp; Pembaruan</h3>
+                  <p className="text-[11px] text-slate-400 font-mono tabular-nums">Detail versi v{currentVersion}, pembaruan OTA, dan pengembang</p>
                 </div>
               </div>
               <button 
@@ -370,7 +365,7 @@ export function Home() {
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Identitas Aplikasi</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">v1.0.1</span>
+                  <span className="text-[10px] font-bold font-mono tabular-nums px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">v{currentVersion}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
@@ -397,48 +392,140 @@ export function Home() {
                 </div>
 
                 <p className="text-[11px] text-slate-600 leading-relaxed">
-                  Aplikasi telah dikonfigurasi untuk memeriksa rilis pembaruan baru secara otomatis langsung dari repositori GitHub (<code>imadeekosatria/demo-webservices-desktop</code>).
+                  Aplikasi memeriksa rilis baru secara otomatis dari repositori GitHub (<code>imadeekosatria/demo-webservices-desktop</code>) dan mendukung unduh serta pasang langsung di dalam aplikasi.
                 </p>
 
-                <div className="flex items-center justify-between gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={handleCheckUpdate}
-                    disabled={checkingUpdate}
-                    className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-60 shadow-xs"
-                  >
-                    <RefreshCw size={12} className={checkingUpdate ? 'animate-spin' : ''} />
-                    {checkingUpdate ? 'Memeriksa Server...' : 'Periksa Pembaruan'}
-                  </button>
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  {updateStatus === 'available' ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={installUpdate}
+                        className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs whitespace-nowrap shrink-0"
+                      >
+                        <DownloadCloud size={13} />
+                        <span>Unduh &amp; Pasang v{latestVersion}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => checkUpdate(false)}
+                        className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0"
+                      >
+                        Periksa Ulang
+                      </button>
+                    </div>
+                  ) : updateStatus === 'ready' ? (
+                    <button
+                      type="button"
+                      onClick={relaunchApp}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs whitespace-nowrap shrink-0"
+                    >
+                      <RotateCcw size={13} />
+                      <span>Restart Sekarang</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => checkUpdate(false)}
+                      disabled={isCheckingUpdate || isUpdatingBusy}
+                      className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-60 shadow-xs whitespace-nowrap shrink-0"
+                    >
+                      <RefreshCw size={12} className={isCheckingUpdate || isUpdatingBusy ? 'animate-spin' : ''} />
+                      <span>
+                        {isCheckingUpdate
+                          ? 'Memeriksa Server...'
+                          : isUpdatingBusy
+                          ? 'Memproses Pembaruan...'
+                          : 'Periksa Pembaruan'}
+                      </span>
+                    </button>
+                  )}
 
                   <span className="text-[11px] text-slate-500 truncate">
                     Endpoint: <code className="text-[10px] bg-white px-1 py-0.5 rounded border border-blue-200">GitHub Releases</code>
                   </span>
                 </div>
 
-                {updateResult && (
-                  <div className={`p-2.5 rounded-lg text-xs border ${
-                    updateResult.available 
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
-                      : updateResult.error 
-                      ? 'bg-amber-50 text-amber-800 border-amber-200'
-                      : 'bg-white text-slate-700 border-slate-200'
-                  }`}>
-                    {updateResult.available ? (
+                {isUpdatingBusy && (
+                  <div className="p-3 bg-white rounded-lg border border-blue-200 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-700">
+                      <span>
+                        {updateStatus === 'installing'
+                          ? `Memasang pembaruan v${latestVersion}...`
+                          : `Mengunduh pembaruan v${latestVersion}...`}
+                      </span>
+                      <span className="font-mono tabular-nums font-bold text-blue-700">{updateProgress}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full w-full bg-blue-600 transition-transform duration-150 ease-out"
+                        style={{
+                          transform: `scaleX(${Math.max(0.04, updateProgress / 100)})`,
+                          transformOrigin: 'left',
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] font-mono tabular-nums text-slate-500">
+                      <span>
+                        {totalBytes > 0
+                          ? `${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)}`
+                          : updateStatus === 'installing'
+                          ? 'Menyelesaikan pemasangan paket...'
+                          : 'Menghubungi server unduhan...'}
+                      </span>
+                      <span>v{currentVersion} → v{latestVersion}</span>
+                    </div>
+                  </div>
+                )}
+
+                {updateStatus === 'available' && (
+                  <div className="p-3 rounded-lg text-xs bg-emerald-50 text-emerald-900 border border-emerald-200">
+                    <div className="flex items-center justify-between gap-2">
+                      <strong>Versi v{latestVersion} tersedia!</strong>
+                      <span className="text-[11px] font-mono tabular-nums text-emerald-700">Saat ini v{currentVersion}</span>
+                    </div>
+                    {updateNotes && <p className="text-[11px] mt-1 text-emerald-700 leading-relaxed">{updateNotes}</p>}
+                  </div>
+                )}
+
+                {updateStatus === 'ready' && (
+                  <div className="p-3 rounded-lg text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-start gap-2">
+                    <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Pembaruan v{latestVersion} berhasil dipasang.</p>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">
+                        Klik tombol <strong>Restart Sekarang</strong> untuk mulai menggunakan versi terbaru.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {updateStatus === 'up-to-date' && updateNotes && (
+                  <div className="p-2.5 rounded-lg text-xs border bg-white text-slate-700 border-slate-200 flex items-center gap-1.5">
+                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                    <span>{updateNotes}</span>
+                  </div>
+                )}
+
+                {updateStatus === 'error' && updateError && (
+                  <div className="p-3 rounded-lg text-xs border bg-amber-50 text-amber-900 border-amber-200 flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
                       <div>
-                        <strong>Versi {updateResult.latestVersion} tersedia!</strong>
-                        <p className="text-[11px] mt-0.5 text-emerald-700">{updateResult.notes}</p>
+                        <p className="font-semibold">{updateError}</p>
+                        <p className="text-[10px] text-amber-700 mt-0.5">
+                          Pastikan koneksi internet aktif dan rilis GitHub sudah terpublikasi.
+                        </p>
                       </div>
-                    ) : updateResult.error ? (
-                      <div>
-                        <p className="font-semibold">{updateResult.error}</p>
-                        <p className="text-[10px] text-amber-600 mt-0.5">Pastikan koneksi internet aktif dan rilis GitHub sudah terpublikasi.</p>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                        <span>{updateResult.notes}</span>
-                      </div>
+                    </div>
+                    {latestVersion && (
+                      <button
+                        type="button"
+                        onClick={installUpdate}
+                        className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-md text-[11px] font-semibold whitespace-nowrap shrink-0"
+                      >
+                        Coba Lagi
+                      </button>
                     )}
                   </div>
                 )}

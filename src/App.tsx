@@ -6,11 +6,14 @@
 import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
 import { ApiProvider } from './context/ApiContext';
+import { UpdaterProvider } from './context/UpdaterContext';
 
 export default function App() {
   return (
     <ApiProvider>
-      <RouterProvider router={router} />
+      <UpdaterProvider>
+        <RouterProvider router={router} />
+      </UpdaterProvider>
     </ApiProvider>
   );
 }
