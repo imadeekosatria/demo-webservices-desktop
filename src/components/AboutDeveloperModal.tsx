@@ -149,9 +149,9 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleCopy(DEVELOPER_INFO.instagramHandle, 'ig')}
+                  onClick={() => handleCopy(DEVELOPER_INFO.instagramUrl, 'ig')}
                   className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors"
-                  title="Salin username Instagram"
+                  title="Salin tautan Instagram"
                 >
                   {copiedField === 'ig' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                 </button>
@@ -185,9 +185,9 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleCopy(DEVELOPER_INFO.whatsappDisplay, 'wa')}
+                  onClick={() => handleCopy(DEVELOPER_INFO.whatsappUrl, 'wa')}
                   className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors"
-                  title="Salin nomor WhatsApp"
+                  title="Salin tautan WhatsApp"
                 >
                   {copiedField === 'wa' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                 </button>

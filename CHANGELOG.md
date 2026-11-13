@@ -2,9 +2,15 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.8] - 2026-11-13
+### Diperbaiki
+- Memperbaiki alur rilis GitHub Actions (`.github/workflows/main.yml`) dengan pemisahan job `create-release`, `build-tauri`, dan `publish-release` menggunakan `releaseId` tunggal agar tidak lagi terjadi rilis ganda atau berkas yang terpisah.
+- Mengaktifkan kembali target build **macOS Intel (`x86_64`)** bersama **macOS Apple Silicon (`aarch64`)**, **Linux (`x86_64` & `ARM64`)**, serta **Windows (`x64`)**, dan mempublikasikan rilis secara otomatis setelah seluruh platform selesai agar **Source code (zip/tar.gz)** serta seluruh aset lengkap tersedia.
+
 ## [1.0.7] - 2026-11-13
 ### Diperbaiki
 - Memperbaiki tombol tautan eksternal (**Buka Instagram** & **Chat WA**) di pop-up **Tentang Pengembang** agar dapat membuka browser bawaan sistem operasi secara langsung pada mode aplikasi desktop Tauri (`tauri-plugin-opener`).
+- Memperbaiki tombol salin pada kontak **Instagram** dan **WhatsApp** di pop-up **Tentang Pengembang** agar menyalin tautan URL penuh (`https://instagram.com/...` dan `https://wa.me/...`).
 - Menyeragamkan seluruh warna teks (*bold*, kode, dan poin daftar) pada bagian catatan perubahan OTA di modal **Info Sistem & Pembaruan** menjadi warna hijau konsisten.
 
 ## [1.0.6] - 2026-11-13

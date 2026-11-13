@@ -12,14 +12,29 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.8',
+    date: '13 Nov 2026',
+    summary: 'Perbaikan pipeline rilis GitHub Actions agar tunggal, lengkap untuk seluruh platform, serta menyertakan source code otomatis.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Memperbaiki workflow rilis GitHub Actions (create-release → build-tauri → publish-release) dengan releaseId tunggal untuk mencegah rilis ganda.',
+          'Menyertakan seluruh platform (Windows x64, macOS Apple Silicon & Intel, Linux x64 & ARM64) beserta file Source code (zip & tar.gz) dan latest.json lengkap.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.7',
     date: '13 Nov 2026',
-    summary: 'Perbaikan pembukaan tautan eksternal di desktop Tauri serta penyeragaman warna hijau pada changelog Info Sistem & Pembaruan.',
+    summary: 'Perbaikan tautan eksternal & salin link kontak di desktop Tauri serta penyeragaman warna hijau pada changelog.',
     sections: [
       {
         category: 'Diperbaiki',
         items: [
           'Menambahkan dukungan tauri-plugin-opener agar tombol Buka Instagram dan Chat WA di pop-up Tentang Pengembang langsung membuka browser default pada mode desktop.',
+          'Memperbaiki tombol salin Instagram dan WhatsApp di pop-up Tentang Pengembang agar menyalin URL tautan penuh (https://instagram.com/... dan https://wa.me/...).',
           'Menyeragamkan warna teks (tebal, kode, dan isi poin) pada kotak changelog pembaruan OTA di modal Info Sistem & Pembaruan menjadi hijau seluruhnya.',
         ],
       },

@@ -2,7 +2,7 @@
 
 Aplikasi desktop untuk melakukan verifikasi data kependudukan melalui *web services* Kemendagri/Dukcapil secara cepat, aman, dan mendukung pembaruan aplikasi langsung dari dalam aplikasi.
 
-- **Versi Saat Ini:** `1.0.7`
+- **Versi Saat Ini:** `1.0.8`
 - **Publisher:** `imadeekosatria`
 
 ---
@@ -25,8 +25,8 @@ Unduh berkas *installer* terbaru dari halaman **[Releases](https://github.com/im
 3. Saat menjalankan aplikasi, Windows akan meminta izin **Administrator** agar aplikasi memiliki hak akses untuk memperbarui berkas di folder instalasi saat pembaruan versi berlangsung.
    > *Catatan: Jika muncul peringatan Windows SmartScreen pada rilis awal, klik **More info → Run anyway**.*
 
-### macOS (Apple Silicon)
-1. Unduh **`Verifikasi.Penduduk.Desktop_<versi>_aarch64.dmg`**.
+### macOS (Apple Silicon & Intel)
+1. Unduh **`Verifikasi.Penduduk.Desktop_<versi>_aarch64.dmg`** (Apple Silicon M1/M2/M3/M4) atau **`Verifikasi.Penduduk.Desktop_<versi>_x64.dmg`** (Mac Intel).
 2. Buka berkas `.dmg` dan seret ikon aplikasi ke folder **Applications**.
 
 ### Linux (Ubuntu / Debian / Fedora)

@@ -6,33 +6,93 @@ on:
     branches:
       - release
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  publish-tauri:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.release.outputs.release_id }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: extract changelog for release notes
+        id: changelog
+        run: bun .github/scripts/extract-changelog.ts
+
+      - name: create single draft release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_BODY: ${{ steps.changelog.outputs.body }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="app-v${VERSION}"
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG" "${{ github.sha }}"
+          git push origin "refs/tags/${TAG}" --force
+
+          EXISTING_ID=$(gh api "repos/${{ github.repository }}/releases?per_page=30" --jq "[.[] | select(.tag_name == \"${TAG}\")][0].id // empty" 2>/dev/null || true)
+          if [ -n "$EXISTING_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/releases/${EXISTING_ID}" \
+              -f tag_name="$TAG" \
+              -f target_commitish="${{ github.sha }}" \
+              -f name="App v${VERSION}" \
+              -f body="$RELEASE_BODY" \
+              -F draft=true >/dev/null
+            echo "release_id=${EXISTING_ID}" >> "$GITHUB_OUTPUT"
+          else
+            CREATED_ID=$(gh api -X POST "repos/${{ github.repository }}/releases" \
+              -f tag_name="$TAG" \
+              -f target_commitish="${{ github.sha }}" \
+              -f name="App v${VERSION}" \
+              -f body="$RELEASE_BODY" \
+              -F draft=true \
+              -F prerelease=false \
+              --jq '.id')
+            echo "release_id=${CREATED_ID}" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-tauri:
+    needs: create-release
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          - platform: 'macos-latest' # macOS Apple Silicon (ARM64)
             args: '--target aarch64-apple-darwin'
-          #- platform: 'macos-latest' # for Intel based macs.
-            #args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
+          - platform: 'macos-latest' # macOS Intel (x86_64)
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04' # Linux x86_64
             args: ''
-          - platform: 'ubuntu-22.04-arm' # Only available in public repos.
+          - platform: 'ubuntu-22.04-arm' # Linux ARM64
             args: ''
-          - platform: 'windows-latest'
+          - platform: 'windows-latest' # Windows x64
             args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm' # This must match the platform value defined above.
+        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
@@ -45,32 +105,47 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          # This matches tauri's default project layout. Change this if you have a different layout.
           workspaces: './src-tauri -> target'
 
       - name: install frontend dependencies
-        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
-        run: bun install # change this to npm, yarn or pnpm depending on which one you use.
+        run: bun install
 
-      - name: extract changelog for release notes
-        id: changelog
-        run: bun .github/scripts/extract-changelog.ts
-
-      - uses: tauri-apps/tauri-action@v0
+      - name: build and upload platform release assets
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPIMAGE_EXTRACT_AND_RUN: 1
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces __VERSION__ with the app version.
-          releaseName: 'App v__VERSION__'
-          releaseBody: ${{ steps.changelog.outputs.body }}
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ needs.create-release.outputs.tag_name }}
           releaseDraft: true
-          prerelease: false
+          includeUpdaterJson: true
+          retryAttempts: 5
           args: ${{ matrix.args }}
+
+  publish-release:
+    needs: [create-release, build-tauri]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: publish release with source code archives
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PATCH "repos/${{ github.repository }}/releases/${{ needs.create-release.outputs.release_id }}" \
+            -F draft=false \
+            -F make_latest=true
+
+      - name: verify published release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ needs.create-release.outputs.tag_name }}" --repo "${{ github.repository }}"
