@@ -1,7 +1,7 @@
 {
   "name": "verifikasi-penduduk-desktop",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": "imadeekosatria",
   "type": "module",
   "scripts": {
@@ -23,6 +23,7 @@
     "@tanstack/react-router": "^1.170.32",
     "@tauri-apps/api": "^2.12.3",
     "@tauri-apps/plugin-http": "^2.8.2",
+    "@tauri-apps/plugin-opener": "^2.7.3",
     "@tauri-apps/plugin-process": "^2.4.0",
     "@tauri-apps/plugin-updater": "^2.13.3",
     "@vitejs/plugin-react": "^5.0.4",

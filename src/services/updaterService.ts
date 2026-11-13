@@ -1,7 +1,7 @@
 import type { Update, DownloadEvent } from '@tauri-apps/plugin-updater';
 import { isDesktopApp } from './apiClient';
 
-export const APP_FALLBACK_VERSION = '1.0.6';
+export const APP_FALLBACK_VERSION = '1.0.7';
 
 export interface UpdateCheckResult {
   available: boolean;

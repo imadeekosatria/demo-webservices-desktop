@@ -12,10 +12,31 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.7',
+    date: '13 Nov 2026',
+    summary: 'Perbaikan pembukaan tautan eksternal di desktop Tauri serta penyeragaman warna hijau pada changelog Info Sistem & Pembaruan.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Menambahkan dukungan tauri-plugin-opener agar tombol Buka Instagram dan Chat WA di pop-up Tentang Pengembang langsung membuka browser default pada mode desktop.',
+          'Menyeragamkan warna teks (tebal, kode, dan isi poin) pada kotak changelog pembaruan OTA di modal Info Sistem & Pembaruan menjadi hijau seluruhnya.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.6',
     date: '13 Nov 2026',
-    summary: 'Perbaikan jarak tombol Mulai Verifikasi di Beranda serta pembaruan tampilan changelog OTA.',
+    summary: 'Pop-up Tentang Pengembang, panduan instalasi README, perbaikan jarak tombol Beranda, serta penyempurnaan tampilan changelog.',
     sections: [
+      {
+        category: 'Ditambahkan',
+        items: [
+          'Pop-up khusus Tentang Pengembang (akses dari Beranda & sidebar) lengkap dengan foto profil, logo & unit kerja Kemendagri, serta kontak Instagram dan WhatsApp berikon Font Awesome.',
+          'Panduan instalasi (Windows, macOS, Linux) dan cara pakai aplikasi di README.md.',
+        ],
+      },
       {
         category: 'Diperbaiki',
         items: [
@@ -108,6 +129,20 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
           'Konfigurasi endpoint GitHub Releases OTA updater dan identitas publisher imadeekosatria.',
           'Pop-up Info Sistem & Pembaruan yang menggabungkan info teknis serta akses fitur internal.',
           'Datepicker tanggal lahir dengan konversi otomatis ke format API DD-MM-YYYY.',
+        ],
+      },
+    ],
+  },
+  {
+    version: '1.0.0',
+    date: '11 Nov 2026',
+    summary: 'Rilis perdana aplikasi desktop Tauri v2 untuk Sistem Verifikasi Kependudukan.',
+    sections: [
+      {
+        category: 'Ditambahkan',
+        items: [
+          'Rilis perdana aplikasi desktop Tauri v2 untuk Sistem Verifikasi Kependudukan.',
+          'Dukungan koneksi native HTTP (tauri-plugin-http) dengan bypass sertifikat SSL lokal server Dukcapil.',
         ],
       },
     ],

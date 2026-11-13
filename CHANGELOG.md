@@ -2,7 +2,16 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.7] - 2026-11-13
+### Diperbaiki
+- Memperbaiki tombol tautan eksternal (**Buka Instagram** & **Chat WA**) di pop-up **Tentang Pengembang** agar dapat membuka browser bawaan sistem operasi secara langsung pada mode aplikasi desktop Tauri (`tauri-plugin-opener`).
+- Menyeragamkan seluruh warna teks (*bold*, kode, dan poin daftar) pada bagian catatan perubahan OTA di modal **Info Sistem & Pembaruan** menjadi warna hijau konsisten.
+
 ## [1.0.6] - 2026-11-13
+### Ditambahkan
+- Pop-up khusus **Tentang Pengembang** yang dapat dibuka dari Beranda maupun sidebar, menampilkan foto profil, unit kerja (**Direktorat Integrasi Data Kependudukan Daerah, Ditjen Dukcapil, Kementerian Dalam Negeri**) dengan logo Kemendagri, serta kontak **Instagram** dan **WhatsApp** (ikon Font Awesome beserta tombol salin & tautan langsung).
+- Berkas **`README.md`** berisi panduan instalasi aplikasi desktop (Windows, macOS, Linux) dan cara penggunaan aplikasi.
+
 ### Diperbaiki
 - Menambahkan jarak (*gap* & *padding*) antara teks **Mulai Verifikasi** dan ikon panah pada kartu modul utama di halaman Beranda agar tidak terlihat rapat.
 - Memastikan tampilan changelog pada modal **Info Sistem & Pembaruan** dan pop-up OTA tampil rapi dengan format daftar poin terstruktur.

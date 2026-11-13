@@ -2,7 +2,7 @@
 
 Aplikasi desktop untuk melakukan verifikasi data kependudukan melalui *web services* Kemendagri/Dukcapil secara cepat, aman, dan mendukung pembaruan aplikasi langsung dari dalam aplikasi.
 
-- **Versi Saat Ini:** `1.0.6`
+- **Versi Saat Ini:** `1.0.7`
 - **Publisher:** `imadeekosatria`
 
 ---

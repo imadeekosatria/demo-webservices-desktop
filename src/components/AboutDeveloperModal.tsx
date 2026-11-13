@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { Check, Copy, ExternalLink, X } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { isDesktopApp } from '../services/apiClient';
 
 interface AboutDeveloperModalProps {
   isOpen: boolean;
@@ -42,6 +43,17 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
     navigator.clipboard.writeText(value);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 1800);
+  };
+
+  const handleOpenExternalUrl = async (e: MouseEvent<HTMLAnchorElement>, url: string) => {
+    if (!isDesktopApp()) return;
+    e.preventDefault();
+    try {
+      const { openUrl } = await import('@tauri-apps/plugin-opener');
+      await openUrl(url);
+    } catch (err) {
+      console.error('Gagal membuka tautan eksternal:', err);
+    }
   };
 
   return (
@@ -147,6 +159,7 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
                   href={DEVELOPER_INFO.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => handleOpenExternalUrl(e, DEVELOPER_INFO.instagramUrl)}
                   className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors whitespace-nowrap"
                 >
                   <span>Buka</span>
@@ -182,6 +195,7 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
                   href={DEVELOPER_INFO.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => handleOpenExternalUrl(e, DEVELOPER_INFO.whatsappUrl)}
                   className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors whitespace-nowrap"
                 >
                   <span>Chat WA</span>
