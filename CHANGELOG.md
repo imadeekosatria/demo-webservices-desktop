@@ -2,6 +2,13 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.10] - 2026-11-13
+### Diperbaiki
+- Memperbaiki penampilan catatan perubahan (*changelog*) pada kotak pembaruan di **Informasi Sistem & Pembaruan** dengan memastikan `latest.json` menyertakan isi changelog penuh saat rilis, menambahkan *fallback* otomatis dari GitHub Releases, serta area gulir vertikal (*scroll-y*) saat daftar perubahan panjang.
+- Membersihkan label teknis dan framework di **Mode Aplikasi**, **Pengaturan API**, **Informasi Sistem & Pembaruan**, serta **Status Runtime Aplikasi > Lingkungan** menjadi **Aplikasi Desktop** dan **Pembaruan Otomatis**.
+- Menghapus bagian **Perintah Build & Rilis Pengembang**, keterangan **Rust Backend**, dan referensi panduan teknis internal agar antarmuka terasa sepenuhnya seperti aplikasi desktop *native*.
+- Membersihkan pesan status koneksi dan catatan updater agar tidak menampilkan istilah teknis internal kepada pengguna.
+
 ## [1.0.9] - 2026-11-13
 ### Diperbaiki
 - Memisahkan informasi **Unit Kerja / Instansi** pada pop-up **Tentang Pengembang** menjadi 3 baris hierarki yang jelas (**Direktorat**, **Direktorat Jenderal**, dan **Kementerian Dalam Negeri**).

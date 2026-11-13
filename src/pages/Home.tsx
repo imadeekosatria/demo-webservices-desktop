@@ -7,8 +7,6 @@ import {
   Database, 
   Monitor, 
   Terminal, 
-  Copy, 
-  Check, 
   X, 
   ArrowRight, 
   CheckCircle2, 
@@ -33,7 +31,6 @@ export function Home() {
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
   const [showTechModal, setShowTechModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
-  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   
   // Password state for internal feature unlock inside Tech Modal
   const [unlockPassword, setUnlockPassword] = useState('');
@@ -67,12 +64,6 @@ export function Home() {
       window.removeEventListener('internal_locked', handleLock);
     };
   }, []);
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCmd(text);
-    setTimeout(() => setCopiedCmd(null), 2000);
-  };
 
   const handleUnlockSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -418,7 +409,7 @@ export function Home() {
                     <span className="text-xs font-bold text-blue-950">Pembaruan Over-The-Air (OTA)</span>
                   </div>
                   <span className="text-[10px] font-semibold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full">
-                    Tauri Updater v2
+                    Pembaruan Otomatis
                   </span>
                 </div>
 
@@ -515,7 +506,14 @@ export function Home() {
                       <strong>Versi v{latestVersion} tersedia!</strong>
                       <span className="text-[11px] font-mono tabular-nums text-emerald-700">Saat ini v{currentVersion}</span>
                     </div>
-                    {updateNotes && <ReleaseNotesView notes={updateNotes} tone="emerald" />}
+                    {updateNotes && (
+                      <ReleaseNotesView
+                        notes={updateNotes}
+                        fallbackText="Pembaruan versi baru tersedia dan siap dipasang."
+                        tone="emerald"
+                        maxHeightClassName="max-h-48 overflow-y-auto overscroll-contain pr-1.5"
+                      />
+                    )}
                   </div>
                 )}
 
@@ -572,7 +570,7 @@ export function Home() {
                     <span className="text-[10px] text-slate-500 uppercase font-semibold block">Lingkungan</span>
                     <span className={`inline-flex items-center gap-1 text-xs font-bold mt-1 ${isDesktop ? 'text-emerald-700' : 'text-blue-700'}`}>
                       <Monitor size={13} />
-                      {isDesktop ? 'Tauri Desktop v2' : 'Web Browser'}
+                      {isDesktop ? 'Aplikasi Desktop' : 'Web Browser'}
                     </span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
@@ -640,48 +638,6 @@ export function Home() {
                 {unlockError && (
                   <p className="text-[11px] text-red-600 font-medium">Password tidak sesuai!</p>
                 )}
-              </div>
-
-              {/* Developer CLI Commands */}
-              <div>
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Perintah Build & Rilis Pengembang
-                </span>
-                <div className="space-y-2.5">
-                  <div className="bg-slate-900 text-slate-200 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-sans">Jalankan Mode Desktop Dev</span>
-                      <code className="text-emerald-400 font-bold">bun tauri:dev</code>
-                    </div>
-                    <button 
-                      onClick={() => copyToClipboard('bun tauri:dev')}
-                      className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                      title="Salin perintah"
-                    >
-                      {copiedCmd === 'bun tauri:dev' ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-                    </button>
-                  </div>
-
-                  <div className="bg-slate-900 text-slate-200 rounded-xl p-3 flex items-center justify-between font-mono text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-sans">Build Installer & Updater Artifacts (.msi / .sig)</span>
-                      <code className="text-blue-400 font-bold">bun tauri:build</code>
-                    </div>
-                    <button 
-                      onClick={() => copyToClipboard('bun tauri:build')}
-                      className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                      title="Salin perintah"
-                    >
-                      {copiedCmd === 'bun tauri:build' ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Documentation file reference */}
-              <div className="flex items-center justify-between pt-2 text-xs text-slate-500 border-t border-slate-100">
-                <span>Dokumentasi lengkap: <code>TAURI_GUIDE.md</code></span>
-                <span className="text-slate-400 text-[11px]">Tauri 2.x • Rust Backend</span>
               </div>
             </div>
 

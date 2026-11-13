@@ -41,7 +41,7 @@ export function SettingsModal() {
                 <h3 className="text-sm font-bold text-slate-800">Konfigurasi API Dukcapil</h3>
                 <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${isDesktop ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
                   {isDesktop ? <Monitor size={10} /> : <Globe size={10} />}
-                  {isDesktop ? 'Tauri Desktop v2' : 'Web Mode'}
+                  {isDesktop ? 'Aplikasi Desktop' : 'Web Mode'}
                 </span>
               </div>
               <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -98,7 +98,7 @@ export function SettingsModal() {
                     required
                   />
                   <p className="text-[11px] text-slate-500 leading-tight">
-                    Digunakan saat aplikasi berjalan di Desktop (Tauri). Default: <code className="bg-slate-100 px-1 py-0.5 rounded">https://172.16.160.177:8000</code>
+                    Digunakan saat aplikasi berjalan di mode Desktop. Default: <code className="bg-slate-100 px-1 py-0.5 rounded">https://172.16.160.177:8000</code>
                   </p>
                 </div>
               </div>

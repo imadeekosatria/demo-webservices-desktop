@@ -105,7 +105,7 @@ export function ChangelogModal() {
               ))}
             </div>
           ) : remoteSections.length > 0 ? (
-            <ReleaseNotesView notes={changelogNotes} tone="slate" />
+            <ReleaseNotesView notes={changelogNotes} tone="slate" maxHeightClassName="" />
           ) : (
             <p className="text-xs text-slate-600 leading-relaxed">
               Aplikasi telah diperbarui ke versi <span className="font-mono font-semibold">v{changelogVersion}</span> dengan peningkatan stabilitas dan keamanan sistem.

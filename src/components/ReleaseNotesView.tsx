@@ -6,6 +6,7 @@ interface ReleaseNotesViewProps {
   notes?: string;
   fallbackText?: string;
   tone?: 'emerald' | 'slate';
+  maxHeightClassName?: string;
 }
 
 /**
@@ -51,6 +52,7 @@ export function ReleaseNotesView({
   notes,
   fallbackText,
   tone = 'emerald',
+  maxHeightClassName = 'max-h-48 overflow-y-auto overscroll-contain pr-1.5',
 }: ReleaseNotesViewProps) {
   const sections = parseRemoteReleaseSections(notes);
 
@@ -68,7 +70,7 @@ export function ReleaseNotesView({
   const iconColor = tone === 'emerald' ? 'text-emerald-600' : 'text-blue-600';
 
   return (
-    <div className="space-y-2.5 max-h-44 overflow-y-auto pr-1">
+    <div className={`space-y-2.5 ${maxHeightClassName}`.trim()}>
       {sections.map((section, sIdx) => (
         <div key={`${section.category}-${sIdx}`} className="space-y-1">
           <p className={`text-[10px] font-bold uppercase tracking-wider ${headingColor}`}>

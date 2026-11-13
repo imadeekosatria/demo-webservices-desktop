@@ -219,7 +219,7 @@ function RootComponent() {
               <p className="text-[10px] font-bold text-slate-500 uppercase">Mode Aplikasi</p>
               <span className={`inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded ${inDesktop ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
                 {inDesktop ? <Monitor size={10} /> : <Globe size={10} />}
-                {inDesktop ? 'Tauri Desktop' : 'Web Browser'}
+                {inDesktop ? 'Aplikasi Desktop' : 'Web Browser'}
               </span>
             </div>
             <p className="text-[10px] font-bold text-slate-500 uppercase mb-0.5">Server Dukcapil</p>

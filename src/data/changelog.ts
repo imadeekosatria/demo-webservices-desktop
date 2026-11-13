@@ -12,6 +12,22 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.10',
+    date: '13 Nov 2026',
+    summary: 'Perbaikan tampilan changelog OTA di Informasi Sistem & Pembaruan dengan scroll-y serta pembersihan label teknis agar antarmuka terasa aplikasi desktop native.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Memperbaiki penampilan changelog pada kotak pembaruan di Informasi Sistem & Pembaruan dengan menyertakan catatan rilis penuh di latest.json, fallback otomatis ke GitHub Releases, serta scroll-y untuk daftar panjang.',
+          'Mengubah label Mode Aplikasi, Pengaturan API, Pembaruan Otomatis, serta Status Runtime > Lingkungan menjadi istilah desktop native (Aplikasi Desktop).',
+          'Menghapus bagian Perintah Build & Rilis Pengembang, keterangan Rust Backend, dan referensi panduan teknis dari pop-up Informasi Sistem & Pembaruan.',
+          'Merapikan pesan status jaringan dan informasi pembaruan agar lebih ramah bagi pengguna.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.9',
     date: '13 Nov 2026',
     summary: 'Perapian tampilan hierarki Unit Kerja (3 baris terpisah) di pop-up Tentang Pengembang serta rilis OTA bersih versi 1.0.9.',

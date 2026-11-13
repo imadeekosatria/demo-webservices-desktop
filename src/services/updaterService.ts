@@ -1,7 +1,58 @@
 import type { Update, DownloadEvent } from '@tauri-apps/plugin-updater';
 import { isDesktopApp } from './apiClient';
+import { getChangelogByVersion } from '../data/changelog';
 
-export const APP_FALLBACK_VERSION = '1.0.9';
+export const APP_FALLBACK_VERSION = '1.0.10';
+const GITHUB_REPO = 'imadeekosatria/demo-webservices-desktop';
+const DEFAULT_TAURI_BODY = 'See the assets to download this version and install.';
+
+function isUsableReleaseNotes(text?: string): boolean {
+  if (!text) return false;
+  const trimmed = text.trim();
+  return trimmed.length > 0 && trimmed !== DEFAULT_TAURI_BODY;
+}
+
+async function fetchReleaseNotesFallback(version: string): Promise<string | undefined> {
+  const cleanVer = version.replace(/^v/i, '').trim();
+  const tagsToTry = [`app-v${cleanVer}`, `v${cleanVer}`];
+
+  try {
+    const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http');
+    for (const tag of tagsToTry) {
+      try {
+        const res = await tauriFetch(
+          `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${encodeURIComponent(tag)}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/vnd.github+json',
+              'User-Agent': 'Verifikasi-Penduduk-Desktop',
+            },
+          }
+        );
+        if (res.ok) {
+          const data = (await res.json()) as { body?: string };
+          if (isUsableReleaseNotes(data?.body)) {
+            return data.body!.trim();
+          }
+        }
+      } catch {
+        // Lanjut coba tag berikutnya
+      }
+    }
+  } catch {
+    // Abaikan jika plugin-http gagal diinisialisasi
+  }
+
+  const localEntry = getChangelogByVersion(cleanVer);
+  if (localEntry && localEntry.sections.length > 0) {
+    return localEntry.sections
+      .map((sec) => `### ${sec.category}\n${sec.items.map((item) => `- ${item}`).join('\n')}`)
+      .join('\n\n');
+  }
+
+  return undefined;
+}
 
 export interface UpdateCheckResult {
   available: boolean;
@@ -14,7 +65,7 @@ export interface UpdateCheckResult {
 }
 
 /**
- * Mengambil versi aplikasi aktif dari runtime Tauri (atau fallback ke konstanta)
+ * Mengambil versi aplikasi aktif dari runtime aplikasi desktop (atau fallback ke konstanta)
  */
 export async function getActiveAppVersion(): Promise<string> {
   if (!isDesktopApp()) {
@@ -39,7 +90,7 @@ export async function checkForAppUpdate(): Promise<UpdateCheckResult> {
     return {
       available: false,
       currentVersion,
-      notes: 'Pembaruan OTA otomatis aktif saat aplikasi dijalankan sebagai desktop app (Tauri).',
+      notes: 'Pembaruan OTA otomatis aktif saat aplikasi dijalankan sebagai aplikasi desktop.',
     };
   }
 
@@ -48,11 +99,16 @@ export async function checkForAppUpdate(): Promise<UpdateCheckResult> {
     const update = await check();
 
     if (update && update.available) {
+      const resolvedNotes = isUsableReleaseNotes(update.body)
+        ? update.body!.trim()
+        : (await fetchReleaseNotesFallback(update.version)) ||
+          'Pembaruan versi baru tersedia dan siap dipasang.';
+
       return {
         available: true,
         currentVersion,
         latestVersion: update.version,
-        notes: update.body || 'Pembaruan versi baru tersedia dan siap dipasang.',
+        notes: resolvedNotes,
         date: update.date,
         updateInstance: update,
       };

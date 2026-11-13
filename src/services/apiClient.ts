@@ -41,7 +41,7 @@ export async function dukcapilFetch(
       return await tauriFetch(directUrl, desktopOptions as any);
     } catch (err: any) {
       console.error('Tauri native HTTP fetch failed:', err);
-      throw new Error(`Koneksi desktop native gagal: ${err.message || err}. Pastikan alamat IP ${serverUrl} dapat dijangkau dan plugin tauri-plugin-http dikonfigurasi dengan dangerous-settings.`);
+      throw new Error(`Koneksi desktop native gagal: ${err.message || err}. Pastikan alamat server ${serverUrl} dapat dijangkau dan koneksi jaringan aktif.`);
     }
   }
 

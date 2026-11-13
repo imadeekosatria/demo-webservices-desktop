@@ -18,6 +18,7 @@ jobs:
     outputs:
       release_id: ${{ steps.release.outputs.release_id }}
       tag_name: ${{ steps.release.outputs.tag_name }}
+      release_body: ${{ steps.changelog.outputs.body }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -125,6 +126,7 @@ jobs:
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           tagName: ${{ needs.create-release.outputs.tag_name }}
+          releaseBody: ${{ needs.create-release.outputs.release_body }}
           releaseDraft: true
           includeUpdaterJson: true
           retryAttempts: 5
@@ -136,6 +138,35 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - name: ensure latest.json includes changelog notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_BODY: ${{ needs.create-release.outputs.release_body }}
+        run: |
+          RELEASE_ID="${{ needs.create-release.outputs.release_id }}"
+          ASSET_ID=$(gh api "repos/${{ github.repository }}/releases/${RELEASE_ID}/assets" --jq '[.[] | select(.name == "latest.json")][0].id // empty')
+          if [ -n "$ASSET_ID" ]; then
+            gh api -H "Accept: application/octet-stream" "repos/${{ github.repository }}/releases/assets/${ASSET_ID}" > latest.json
+            node -e '
+              const fs = require("fs");
+              const data = JSON.parse(fs.readFileSync("latest.json", "utf8"));
+              const body = (process.env.RELEASE_BODY || "").trim();
+              if (body && (!data.notes || !data.notes.trim() || data.notes === "See the assets to download this version and install.")) {
+                data.notes = body;
+                fs.writeFileSync("latest.json", JSON.stringify(data, null, 2));
+                fs.writeFileSync(".latest_patched", "1");
+              }
+            '
+            if [ -f .latest_patched ]; then
+              gh api -X DELETE "repos/${{ github.repository }}/releases/assets/${ASSET_ID}" >/dev/null
+              gh api -X POST \
+                -H "Content-Type: application/json" \
+                "https://uploads.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets?name=latest.json" \
+                --data-binary @latest.json >/dev/null
+              echo "Patched latest.json notes with extracted changelog."
+            fi
+          fi
+
       - name: publish release with source code archives
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
