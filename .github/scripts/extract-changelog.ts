@@ -60,15 +60,11 @@ function buildReleaseBody(): string {
     section = extractVersionSection(md, version);
   }
 
-  const gitSummary = getGitCommitsSummary();
-
   if (section) {
-    if (gitSummary) {
-      return `${section}\n\n### Commit Terbaru\n${gitSummary}`;
-    }
     return section;
   }
 
+  const gitSummary = getGitCommitsSummary();
   if (gitSummary) {
     return `### Perubahan pada v${version}\n${gitSummary}`;
   }

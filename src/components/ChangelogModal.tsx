@@ -4,8 +4,9 @@ import { useUpdater } from '../context/UpdaterContext';
 import {
   CHANGELOG_ENTRIES,
   getChangelogByVersion,
-  parseRemoteReleaseNotes,
+  parseRemoteReleaseSections,
 } from '../data/changelog';
+import { ReleaseNotesView } from './ReleaseNotesView';
 
 export function ChangelogModal() {
   const {
@@ -36,7 +37,7 @@ export function ChangelogModal() {
   if (!showChangelogModal) return null;
 
   const entry = getChangelogByVersion(changelogVersion);
-  const remoteLines = parseRemoteReleaseNotes(changelogNotes);
+  const remoteSections = parseRemoteReleaseSections(changelogNotes);
   const olderEntries = CHANGELOG_ENTRIES.filter(
     (item) => item.version !== changelogVersion.replace(/^v/i, '')
   );
@@ -103,20 +104,8 @@ export function ChangelogModal() {
                 </div>
               ))}
             </div>
-          ) : remoteLines.length > 0 ? (
-            <div className="space-y-2.5">
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Pembaruan pada v{changelogVersion}
-              </h4>
-              <ul className="space-y-2">
-                {remoteLines.map((line, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
-                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          ) : remoteSections.length > 0 ? (
+            <ReleaseNotesView notes={changelogNotes} tone="slate" />
           ) : (
             <p className="text-xs text-slate-600 leading-relaxed">
               Aplikasi telah diperbarui ke versi <span className="font-mono font-semibold">v{changelogVersion}</span> dengan peningkatan stabilitas dan keamanan sistem.

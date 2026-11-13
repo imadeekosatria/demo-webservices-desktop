@@ -26,6 +26,7 @@ import { isDesktopApp } from '../services/apiClient';
 import { useApiConfig } from '../context/ApiContext';
 import { useUpdater } from '../context/UpdaterContext';
 import { formatBytes } from '../services/updaterService';
+import { ReleaseNotesView } from '../components/ReleaseNotesView';
 
 export function Home() {
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
@@ -492,12 +493,12 @@ export function Home() {
                 )}
 
                 {updateStatus === 'available' && (
-                  <div className="p-3 rounded-lg text-xs bg-emerald-50 text-emerald-900 border border-emerald-200">
-                    <div className="flex items-center justify-between gap-2">
+                  <div className="p-3.5 rounded-lg text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2 border-b border-emerald-200/70 pb-2">
                       <strong>Versi v{latestVersion} tersedia!</strong>
                       <span className="text-[11px] font-mono tabular-nums text-emerald-700">Saat ini v{currentVersion}</span>
                     </div>
-                    {updateNotes && <p className="text-[11px] mt-1 text-emerald-700 leading-relaxed">{updateNotes}</p>}
+                    {updateNotes && <ReleaseNotesView notes={updateNotes} tone="emerald" />}
                   </div>
                 )}
 

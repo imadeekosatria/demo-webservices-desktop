@@ -2,6 +2,15 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.5] - 2026-11-13
+### Diperbaiki
+- Merapikan format tampilan changelog pada modal **Info Sistem & Pembaruan** agar tampil terstruktur tanpa simbol Markdown mentah.
+- Menyesuaikan layer pop-up notifikasi OTA agar tidak menutupi tombol kontrol modal yang sedang terbuka.
+- Membersihkan isi catatan rilis otomatis agar lebih ringkas dan mudah dibaca pengguna.
+
+### Ditambahkan
+- Pengujian menyeluruh pembaruan OTA dari versi `1.0.4` ke `1.0.5` beserta pop-up changelog otomatis satu kali.
+
 ## [1.0.4] - 2026-11-13
 ### Ditambahkan
 - Pop-up **Changelog ("Apa yang Baru")** otomatis yang muncul **hanya satu kali** setelah aplikasi diperbarui ke versi baru.

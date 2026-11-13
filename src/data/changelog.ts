@@ -1,5 +1,5 @@
 export interface ChangelogSection {
-  category: 'Ditambahkan' | 'Diperbarui' | 'Diperbaiki';
+  category: string;
   items: string[];
 }
 
@@ -11,6 +11,27 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  {
+    version: '1.0.5',
+    date: '13 Nov 2026',
+    summary: 'Perapihan tampilan catatan pembaruan (changelog) di Info Sistem & Pembaruan serta pop-up OTA.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Merapikan format tampilan changelog pada modal Info Sistem & Pembaruan agar tampil sebagai daftar poin terstruktur tanpa simbol Markdown mentah.',
+          'Menyesuaikan posisi layer notifikasi pop-up OTA agar tidak menutupi tombol Tutup ketika modal sedang terbuka.',
+          'Membersihkan isi catatan rilis otomatis di GitHub Actions agar lebih ringkas dan mudah dibaca pengguna.',
+        ],
+      },
+      {
+        category: 'Ditambahkan',
+        items: [
+          'Pengujian menyeluruh alur OTA v1.0.4 ke v1.0.5 beserta pop-up changelog otomatis yang hanya muncul satu kali.',
+        ],
+      },
+    ],
+  },
   {
     version: '1.0.4',
     date: '13 Nov 2026',
@@ -85,19 +106,79 @@ export function getChangelogByVersion(version: string): ChangelogEntry | undefin
 }
 
 /**
- * Mengurai teks release notes mentah dari GitHub Releases (latest.json) menjadi daftar poin bersih
+ * Menghapus simbol formatting Markdown (**bold**, *italic*, `code`, ###) untuk ringkasan teks polos
  */
-export function parseRemoteReleaseNotes(rawNotes?: string): string[] {
+export function stripInlineMarkdown(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .trim();
+}
+
+/**
+ * Mengurai teks release notes mentah dari GitHub Releases (latest.json)
+ * menjadi daftar section terstruktur (menangani format multi-baris maupun yang tergabung satu baris).
+ */
+export function parseRemoteReleaseSections(rawNotes?: string): ChangelogSection[] {
   if (!rawNotes) return [];
   const trimmed = rawNotes.trim();
   if (!trimmed || trimmed === 'See the assets to download this version and install.') {
     return [];
   }
 
-  return trimmed
-    .split(/\r?\n/)
+  // Normalisasi baris baru termasuk kasus di mana heading/bullet bergabung dalam satu baris
+  const normalized = trimmed
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+(#{2,3}\s+)/g, '\n$1')
+    .replace(/(#{2,3}\s+[^\n-]+?)\s+(-\s+)/g, '$1\n$2')
+    .replace(/\s+(-\s+(?:\*\*|[A-Z0-9`]))/g, '\n$1');
+
+  const lines = normalized
+    .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith('### '))
-    .map((line) => line.replace(/^[-*•]\s+/, '').trim())
     .filter(Boolean);
+
+  const sections: ChangelogSection[] = [];
+  let currentSection: ChangelogSection = { category: 'Pembaruan', items: [] };
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      if (currentSection.items.length > 0) {
+        sections.push(currentSection);
+      }
+      currentSection = {
+        category: stripInlineMarkdown(headingMatch[1]),
+        items: [],
+      };
+      continue;
+    }
+
+    const cleanItem = line.replace(/^[-*•]\s+/, '').trim();
+    if (cleanItem) {
+      currentSection.items.push(cleanItem);
+    }
+  }
+
+  if (currentSection.items.length > 0) {
+    sections.push(currentSection);
+  }
+
+  // Jika section non-commit sudah tersedia, sembunyikan section "Commit Terbaru" agar tetap rapi
+  const nonCommitSections = sections.filter(
+    (sec) => !sec.category.toLowerCase().includes('commit')
+  );
+
+  return nonCommitSections.length > 0 ? nonCommitSections : sections;
+}
+
+/**
+ * Mengambil daftar baris ringkas tanpa simbol Markdown (untuk banner notifikasi kompak)
+ */
+export function parseRemoteReleaseNotes(rawNotes?: string): string[] {
+  return parseRemoteReleaseSections(rawNotes).flatMap((sec) =>
+    sec.items.map((item) => stripInlineMarkdown(item))
+  );
 }

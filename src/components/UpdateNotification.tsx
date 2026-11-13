@@ -1,6 +1,7 @@
 import { DownloadCloud, RefreshCw, CheckCircle2, AlertCircle, X, RotateCcw } from 'lucide-react';
 import { useUpdater } from '../context/UpdaterContext';
 import { formatBytes } from '../services/updaterService';
+import { parseRemoteReleaseNotes } from '../data/changelog';
 
 export function UpdateNotification() {
   const {
@@ -30,12 +31,13 @@ export function UpdateNotification() {
   if (!showBanner) return null;
 
   const isBusy = status === 'downloading' || status === 'installing';
+  const previewLines = parseRemoteReleaseNotes(notes).slice(0, 2);
 
   return (
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 right-5 z-50 w-[calc(100%-2.5rem)] max-w-sm bg-white rounded-xl border border-slate-200 shadow-lg p-4 text-slate-900 transition-opacity duration-200"
+      className="fixed bottom-5 right-5 z-40 w-[calc(100%-2.5rem)] max-w-sm bg-white rounded-xl border border-slate-200 shadow-lg p-4 text-slate-900 transition-opacity duration-200"
     >
       <div className="flex items-start gap-3">
         <div
@@ -93,10 +95,15 @@ export function UpdateNotification() {
             )}
           </p>
 
-          {status === 'available' && notes && (
-            <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">
-              {notes}
-            </p>
+          {status === 'available' && previewLines.length > 0 && (
+            <ul className="mt-2 space-y-1 text-xs text-slate-600 leading-relaxed">
+              {previewLines.map((line, idx) => (
+                <li key={idx} className="flex items-start gap-1.5">
+                  <span className="text-slate-400 select-none">•</span>
+                  <span className="line-clamp-2">{line}</span>
+                </li>
+              ))}
+            </ul>
           )}
 
           {isBusy && (
