@@ -2,6 +2,11 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.9] - 2026-11-13
+### Diperbaiki
+- Memisahkan informasi **Unit Kerja / Instansi** pada pop-up **Tentang Pengembang** menjadi 3 baris hierarki yang jelas (**Direktorat**, **Direktorat Jenderal**, dan **Kementerian Dalam Negeri**).
+- Menaikkan versi rilis ke `1.0.9` agar seluruh pengguna (termasuk pengguna versi `1.0.8`) menerima pembaruan OTA secara otomatis dengan tag rilis bersih.
+
 ## [1.0.8] - 2026-11-13
 ### Diperbaiki
 - Memperbaiki alur rilis GitHub Actions (`.github/workflows/main.yml`) dengan pemisahan job `create-release`, `build-tauri`, dan `publish-release` menggunakan `releaseId` tunggal agar tidak lagi terjadi rilis ganda atau berkas yang terpisah.

@@ -14,7 +14,8 @@ const DEVELOPER_INFO = {
   handle: 'imadeekosatria',
   photoUrl: '/assets/aistudio/IMG_3058_Original_fecaa48c.jpg',
   directorate: 'Direktorat Integrasi Data Kependudukan Daerah',
-  ministry: 'Direktorat Jenderal Kependudukan dan Pencatatan Sipil, Kementerian Dalam Negeri (Kemendagri)',
+  directorateGeneral: 'Direktorat Jenderal Kependudukan dan Pencatatan Sipil',
+  ministry: 'Kementerian Dalam Negeri',
   instagramHandle: 'imadeekosatria',
   instagramUrl: 'https://instagram.com/imadeekosatria',
   whatsappDisplay: '081803634659',
@@ -122,7 +123,8 @@ export function AboutDeveloperModal({ isOpen, onClose }: AboutDeveloperModalProp
                 Unit Kerja / Instansi
               </span>
               <p className="font-semibold text-slate-800">{DEVELOPER_INFO.directorate}</p>
-              <p className="text-slate-600 mt-0.5">{DEVELOPER_INFO.ministry}</p>
+              <p className="text-slate-600 mt-0.5">{DEVELOPER_INFO.directorateGeneral}</p>
+              <p className="text-slate-500 mt-0.5">{DEVELOPER_INFO.ministry}</p>
             </div>
           </div>
 

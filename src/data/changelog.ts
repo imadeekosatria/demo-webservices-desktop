@@ -12,6 +12,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.9',
+    date: '13 Nov 2026',
+    summary: 'Perapian tampilan hierarki Unit Kerja (3 baris terpisah) di pop-up Tentang Pengembang serta rilis OTA bersih versi 1.0.9.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Memisahkan tampilan Unit Kerja / Instansi di pop-up Tentang Pengembang menjadi 3 baris terstruktur: Direktorat, Direktorat Jenderal, dan Kementerian Dalam Negeri.',
+          'Menaikkan versi rilis ke 1.0.9 agar pembaruan OTA berjalan otomatis untuk seluruh pengguna termasuk yang sudah berada di versi 1.0.8.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.8',
     date: '13 Nov 2026',
     summary: 'Perbaikan pipeline rilis GitHub Actions agar tunggal, lengkap untuk seluruh platform, serta menyertakan source code otomatis.',
