@@ -1,7 +1,7 @@
 {
   "name": "verifikasi-penduduk-desktop",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "imadeekosatria",
   "type": "module",
   "scripts": {
@@ -15,6 +15,9 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@tanstack/react-router": "^1.170.32",

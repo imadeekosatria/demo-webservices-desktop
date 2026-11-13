@@ -2,6 +2,11 @@
 
 Seluruh perubahan penting pada aplikasi **Verifikasi Penduduk Desktop** dicatat pada berkas ini mengikuti standar [Semantic Versioning](https://semver.org/).
 
+## [1.0.6] - 2026-11-13
+### Diperbaiki
+- Menambahkan jarak (*gap* & *padding*) antara teks **Mulai Verifikasi** dan ikon panah pada kartu modul utama di halaman Beranda agar tidak terlihat rapat.
+- Memastikan tampilan changelog pada modal **Info Sistem & Pembaruan** dan pop-up OTA tampil rapi dengan format daftar poin terstruktur.
+
 ## [1.0.5] - 2026-11-13
 ### Diperbaiki
 - Merapikan format tampilan changelog pada modal **Info Sistem & Pembaruan** agar tampil terstruktur tanpa simbol Markdown mentah.

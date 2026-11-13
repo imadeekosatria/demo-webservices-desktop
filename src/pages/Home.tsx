@@ -27,10 +27,12 @@ import { useApiConfig } from '../context/ApiContext';
 import { useUpdater } from '../context/UpdaterContext';
 import { formatBytes } from '../services/updaterService';
 import { ReleaseNotesView } from '../components/ReleaseNotesView';
+import { AboutDeveloperModal } from '../components/AboutDeveloperModal';
 
 export function Home() {
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
   const [showTechModal, setShowTechModal] = useState(false);
+  const [showDeveloperModal, setShowDeveloperModal] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   
   // Password state for internal feature unlock inside Tech Modal
@@ -122,23 +124,38 @@ export function Home() {
               Platform validasi identitas penduduk berbasis web services Kemendagri. Lakukan pencocokan elemen data secara aman, cepat, dan terpercaya.
             </p>
             <div className="mt-2.5 flex items-center justify-center md:justify-start gap-2 text-xs text-slate-400">
-              <span className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setShowDeveloperModal(true)}
+                className="inline-flex items-center gap-1 hover:text-blue-600 transition-colors"
+                title="Lihat profil pengembang"
+              >
                 <User size={13} className="text-slate-400" />
-                Dibuat oleh: <strong className="text-slate-700 font-medium">imadeekosatria</strong>
-              </span>
+                <span>Dibuat oleh: <strong className="text-slate-700 font-medium underline decoration-slate-300 underline-offset-2 hover:text-blue-600">imadeekosatria</strong></span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Action Button: Technical Info Modal */}
+        {/* Action Buttons: System Info & About Developer */}
         <div className="shrink-0 z-10 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-2">
           <button
+            type="button"
             onClick={() => setShowTechModal(true)}
-            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-xs"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-xs whitespace-nowrap"
             title="Buka informasi teknis framework, OTA update, dan developer"
           >
             <Code2 size={15} className="text-blue-600" />
-            <span>Info Sistem & Pembaruan</span>
+            <span>Info Sistem &amp; Pembaruan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowDeveloperModal(true)}
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-xs whitespace-nowrap"
+            title="Lihat profil dan kontak pengembang"
+          >
+            <User size={15} className="text-slate-600" />
+            <span>Tentang Pengembang</span>
           </button>
         </div>
 
@@ -209,9 +226,9 @@ export function Home() {
                 </div>
               </div>
 
-              <div className={`${!isInternalUnlocked ? 'md:border-t-0 md:pt-0 md:pl-4 border-t pt-4' : 'border-t pt-3'} border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform shrink-0`}>
-                <span className="hidden sm:inline">Mulai Verifikasi</span>
-                <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
+              <div className={`${!isInternalUnlocked ? 'md:border-t-0 md:pt-0 md:border-l md:pl-6 border-t pt-4' : 'border-t pt-3'} border-slate-100 flex items-center justify-between gap-3 text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform shrink-0`}>
+                <span className="hidden sm:inline whitespace-nowrap">Mulai Verifikasi</span>
+                <div className="w-8 h-8 rounded-full bg-blue-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
                   <ArrowRight size={16} />
                 </div>
               </div>
@@ -681,6 +698,11 @@ export function Home() {
           </div>
         </div>
       )}
+
+      <AboutDeveloperModal
+        isOpen={showDeveloperModal}
+        onClose={() => setShowDeveloperModal(false)}
+      />
     </div>
   );
 }

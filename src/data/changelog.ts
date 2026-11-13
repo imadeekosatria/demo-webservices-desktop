@@ -12,6 +12,20 @@ export interface ChangelogEntry {
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
+    version: '1.0.6',
+    date: '13 Nov 2026',
+    summary: 'Perbaikan jarak tombol Mulai Verifikasi di Beranda serta pembaruan tampilan changelog OTA.',
+    sections: [
+      {
+        category: 'Diperbaiki',
+        items: [
+          'Menambahkan jarak (gap & padding) antara teks Mulai Verifikasi dan ikon panah pada kartu modul utama di Beranda.',
+          'Memastikan tampilan catatan perubahan di modal Info Sistem & Pembaruan serta pop-up OTA tampil terstruktur dan mudah dibaca.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.0.5',
     date: '13 Nov 2026',
     summary: 'Perapihan tampilan catatan pembaruan (changelog) di Info Sistem & Pembaruan serta pop-up OTA.',

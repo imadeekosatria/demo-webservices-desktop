@@ -6,6 +6,7 @@ import { useApiConfig } from '../context/ApiContext';
 import { useUpdater } from '../context/UpdaterContext';
 import { UpdateNotification } from '../components/UpdateNotification';
 import { ChangelogModal } from '../components/ChangelogModal';
+import { AboutDeveloperModal } from '../components/AboutDeveloperModal';
 import { dukcapilFetch, isDesktopApp } from '../services/apiClient';
 
 export const Route = createRootRoute({
@@ -20,6 +21,7 @@ function RootComponent() {
   const { config } = useApiConfig();
   const { currentVersion } = useUpdater();
   const [serverStatus, setServerStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+  const [showDeveloperModal, setShowDeveloperModal] = useState(false);
 
   // Secret Internal Unlock Logic
   const [isInternalUnlocked, setIsInternalUnlocked] = useState(false);
@@ -226,7 +228,14 @@ function RootComponent() {
             </p>
             <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500">
               <span className="font-semibold text-slate-700 font-mono tabular-nums">v{currentVersion}</span>
-              <span>oleh <strong className="text-slate-700">imadeekosatria</strong></span>
+              <button
+                type="button"
+                onClick={() => setShowDeveloperModal(true)}
+                className="hover:text-blue-600 transition-colors text-right"
+                title="Tentang Pengembang"
+              >
+                oleh <strong className="text-slate-700 hover:text-blue-600 underline decoration-slate-300 underline-offset-2">imadeekosatria</strong>
+              </button>
             </div>
           </div>
         </aside>
@@ -285,6 +294,10 @@ function RootComponent() {
 
       <UpdateNotification />
       <ChangelogModal />
+      <AboutDeveloperModal
+        isOpen={showDeveloperModal}
+        onClose={() => setShowDeveloperModal(false)}
+      />
     </div>
   );
 }
