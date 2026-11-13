@@ -67,7 +67,7 @@ Hasil build installer akan berada di:
 
 ## 📁 Struktur Konfigurasi Tauri v2
 
-- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi (versi `1.0.2`), identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater), dan bundle.
+- **`src-tauri/tauri.conf.json`**: Konfigurasi jendela aplikasi (versi `1.0.3`), identifier paket (`com.imadeekosatria.verifikasi.penduduk`), plugins (HTTP & Updater), dan bundle.
 - **`src-tauri/Cargo.toml`**: Dependency Rust untuk Tauri v2 (`tauri`, `tauri-plugin-http`, `tauri-plugin-updater`, `tauri-plugin-process`, `serde`).
 - **`src-tauri/capabilities/default.json`**: Sistem perizinan keamanan v2 (Capability) untuk mengizinkan request HTTP native, OTA updater (`updater:default`), dan restart proses (`process:default`, `process:allow-restart`).
 - **`src-tauri/src/main.rs` & `src-tauri/src/lib.rs`**: Entry point aplikasi desktop Rust dengan plugin HTTP, Updater, dan Process diinisialisasi.
@@ -92,8 +92,8 @@ Perintah ini akan mencetak:
 - **Private Key**: Simpan di **GitHub Repository Secrets** dengan nama `TAURI_SIGNING_PRIVATE_KEY` (dan `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` jika menggunakan password).
 
 ### 2. Alur Kerja Rilis & Update Otomatis di Dalam Aplikasi
-1. Update versi secara seragam di `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, dan `APP_FALLBACK_VERSION` di `src/services/updaterService.ts` (contoh: ke `1.0.2`).
-2. Push ke branch `main`; GitHub Action akan meng-compile aplikasi, menandatangani installer, dan mengunggah file `latest.json` beserta `.sig` ke GitHub Releases.
+1. Update versi secara seragam di `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, dan `APP_FALLBACK_VERSION` di `src/services/updaterService.ts` (contoh: ke `1.0.3`).
+2. Push ke branch `release` (atau jalankan manual melalui **Actions → publish → Run workflow**); GitHub Action akan meng-compile aplikasi, menandatangani installer, dan membuat Draft Release berisi `latest.json` beserta `.sig`. Setelah selesai, buka GitHub Releases dan klik **Publish release**.
 3. Saat aplikasi desktop dibuka, aplikasi otomatis memeriksa rilis baru melalui endpoint:
    `https://github.com/imadeekosatria/demo-webservices-desktop/releases/latest/download/latest.json`
 4. Jika ada versi baru, muncul notifikasi pop-up (atau lewat tombol **Periksa Pembaruan** di **Info Sistem & Pembaruan**). Pengguna dapat langsung menekan **Unduh & Pasang**, memantau progress unduhan, lalu menekan **Restart Sekarang** untuk menerapkan versi baru.

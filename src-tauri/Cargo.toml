@@ -1,6 +1,6 @@
 [package]
 name = "verifikasi-penduduk-desktop"
-version = "1.0.2"
+version = "1.0.3"
 description = "Aplikasi versi desktop demo untuk verifikasi data penduduk"
 authors = ["imadeekosatria"]
 edition = "2021"
